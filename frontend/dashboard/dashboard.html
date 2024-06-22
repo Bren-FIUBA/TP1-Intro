@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindspace</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <script src="dashboard.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <nav class="navbar-div">
+            <button class="navbar-button">A</button>
+            <button class="navbar-button">B</button>
+            <button class="navbar-button">C</button>
+        </nav>
+
+        <div class="main-div">
+            <header>
+                <h1 class="date-header">Bienvenido/a, <span class="day-text">[user]</span>!</h1>
+                <h4 class="date-info-header">Hoy es [dia], [fecha] del [año]</h4>
+            </header>
+
+            <div class="board-text-div">
+                <h3 class="board-text">Objetivos de hoy</h3>
+                <h3 class="board-text">Tareas de hoy</h3>
+            </div>
+
+            <div class="board-div">
+    
+                <div class="daily-goals-div">
+                    <div class="daily-goals-card"></div>
+                </div>
+                <div class="todo-and-stats-div">
+                    
+                    <div class="todo-div">
+                        <div class="tasks-container">
+                            <!--tareas que se irán agregando-->
+                        </div>
+                        <input id="create-task-button" type="button" value="+" onclick="agregarDivTarea()">
+                    </div>
+                    <div class="stats-div">
+
+                    </div>
+                </div>
+    
+            </div>
+        </div>
+    
+        <div class="side-div">
+    
+            <div class="clock-div">
+                <p class="false-clock">[hora]</p>
+            </div>
+
+            <div class="sep"></div>
+
+            <div class="calendar-div">
+
+            </div>
+
+            <div class="sep"></div>
+
+            <div class="schedule-div">
+                <h4 class="schedule-title">Agenda</h4>
+                <div class="schedule">
+
+                </div>
+            </div>
+        
+        </div>
+    </div>
+
+</body>
+</html>
