@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrarse - MindSpace</title>
+    <link rel="stylesheet" href="register.css">
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="img-div">
+            <img src="./../img/login-image.png">
+        </div>
+
+        <div class="register-container">
+            <div class="vertical-line"></div>
+            <h1>Registrarse</h1>
+            <h3>
+                MindSpace
+            </h3>
+            <form id="register-form">
+                <p id="error-message">error-message</p>
+                <input class="register-input" id="user" type="text" placeholder="Crear usuario">
+                <input class="register-input" id="username" type="text" placeholder="Nombre/Apodo">
+                <input class="register-input" id="password" type="password" placeholder="Crear contraseña">
+                <input class="register-input" id="confirm-password" type="password" placeholder="Confirmar Contraseña">
+                <div class="pronoun-section-container">
+                    <p>Selecciona tus pronombres:</p>
+                    <label>
+                        <input type="radio" name="pronouns" value="masculinos">
+                        <span class="custom-radio"></span>
+                        Masculinos
+                    </label>
+                    <label>
+                        <input type="radio" name="pronouns" value="femeninos">
+                        <span class="custom-radio"></span>
+                        Femeninos
+                    </label>
+                    <label>
+                        <input type="radio" name="pronouns" value="inclusivos">
+                        <span class="custom-radio"></span>
+                        Inclusivos
+                    </label>
+                </div>
+
+                <input id="register-button" type="submit" value="INGRESAR">
+                <p>¿Ya tienes una cuenta? <a href="/login">Inicia Sesión.</a></p>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
