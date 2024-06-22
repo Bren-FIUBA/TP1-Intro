@@ -76,6 +76,13 @@ h3 {
     margin-bottom: 20px
 }
 
+#invalid-data-message {
+    color: rgb(160, 40, 40);
+    font-size: 12px;
+    opacity: 0;
+}
+
+
 .login-input {
     margin: 5px 0px;
     padding: 4px 8px;

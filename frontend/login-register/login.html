@@ -31,5 +31,29 @@
             </form>
         </div>
     </div>
+    <script>
+        // Asignándole un evento al form cuando la información de éste se "submittea", cosa que ocurre cuando se presiona el input de tipo submit dentro del form.
+        document.getElementById("login-form").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+
+            // Obtener los valores de los campos de usuario y contraseña
+            // el .trim() es para obtener el dato del input sin espacios en blanco accidentales y evitar errores más adelante en la validación de datos.
+            const user = document.getElementById("user").value.trim();
+            const password = document.getElementById("password").value.trim();
+
+            // Validar que los datos sean correctos
+            if (user === 'Bren' && password === "1234") {
+                // Redirigir a otra página (ajusta la URL según sea necesario)
+                window.location.href = './../dashboard/dashboard.html';
+            } else {
+                errorMessage = document.getElementById("invalid-data-message");
+                errorMessage.style.opacity = 1;
+
+                // limpiamos los campos para un nuevo intento
+                document.getElementById("password").value = "";
+                document.getElementById("user").value = "";
+            }
+        });
+    </script>
 </body>
 </html>
