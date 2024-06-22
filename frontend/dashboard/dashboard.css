@@ -1,4 +1,4 @@
-/* Declarin color variables */
+/* Declarando variables de colores */
 :root {
     --main-purple: rgb(35, 7, 73);
     --board-color: rgb(14, 11, 19);
@@ -113,8 +113,16 @@ body {
         .board-text {
             font-size: 18px;
             font-weight: lighter;
-            color: var(--primary-text-color);;
-            flex: 1;
+            color: var(--primary-text-color);
+            padding-left: 15px;
+        }
+
+        #daily-goals-header {
+            flex: 4;
+        }
+
+        #daily-tasks-header {
+            flex: 5;
         }
 
     .board-div {
@@ -166,6 +174,145 @@ body {
                     padding: 10px;
                     box-sizing: border-box;
                 }
+
+                    /* Todo el contenido del todo-div */
+
+                    /* Botón de agregar tarea */
+                    #create-task-button {
+                        width: 95%;
+                        border: none;
+                        background-color: inherit;
+                        color: rgb(78, 78, 78);
+                        font-size: 20px;
+                        border-radius: 5px;
+                        padding: 0;
+                        margin: 5px;
+                        transition: color 0.5s ease, background-color 0.5s ease;
+                    }
+
+                    #create-task-button:hover {
+                        background-color: var(--board-color);
+                        color: var(--main-purple);
+                    }
+
+                    /* Contenedor de cada tarea que se agregue */
+                    .tasks-container {
+                        display: flex;
+                        flex-direction: column;
+                        margin: 0;
+                        width: 100%;
+                        justify-content: space-between;
+                        overflow-y: auto;
+                        /* Personalización de la scrollbar del div */
+                        scrollbar-width: thin; /* Ancho de la scrollbar */
+                        scrollbar-color: transparent transparent; /* Color de la scrollbar y del fondo */
+                        transition: scrollbar-color 0.3s ease;
+                    }
+
+                    .tasks-container:hover {
+                        scrollbar-color: var(--main-purple) transparent;
+                    }
+
+
+                    /* Div que se crea por cada tarea agregada */
+
+                    .task-div {
+                        display: flex;
+                        gap: 4px;
+                        margin: 1px;
+                        align-items: flex-start;
+                        justify-content: space-between;
+                        border-radius: 5px;
+                        transition: background-color 0.3s ease;
+                    }
+
+                    .task-div:hover {
+                        background-color: var(--board-color);
+                    }
+
+
+                    /* Todo el contenido de cada task-div */
+
+                    .task-checkbox {
+                        appearance: none;
+                        -webkit-appearance: none;
+                        -moz-appearance: none;
+                        min-width: 20px; /* Ajusta el tamaño del checkbox */
+                        min-height: 20px; /* Ajusta el tamaño del checkbox */
+                        border: 2px var(--main-purple) solid; /* Color del borde */
+                        border-radius: 50%; /* Hace que el checkbox sea redondo */
+                        background-color: inherit; /* Color de fondo al estar desmarcado */
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin: 10px 5px;
+                    }
+
+                    .task-checkbox:hover {
+                        color: var(--main-purple);
+                        text-shadow: 0 0 15px rgb(198, 187, 212);
+                    }
+                    
+                    .task-checkbox:checked {
+                        background-color: var(--main-purple); /* Color de fondo al estar marcado */
+                        border: none; /* Mantiene el borde del mismo color que el fondo */
+                        color: var(--primary-text-color); /* Color del tilde */
+                        background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M20.2929 6.29289C20.6834 6.68342 20.6834 7.31658 20.2929 7.70711L10.7071 17.2929C10.3166 17.6834 9.68342 17.6834 9.29289 17.2929L3.70711 11.7071C3.31658 11.3166 3.31658 10.6834 3.70711 10.2929C4.09763 9.90237 4.7308 9.90237 5.12132 10.2929L10 15.1716L18.8787 6.29289C19.2692 5.90237 19.9024 5.90237 20.2929 6.29289Z" fill="white"%3E%3C/path%3E%3C/svg%3E');
+                        background-size: 70%; /* Ajusta el tamaño del tilde */
+                        background-repeat: no-repeat;
+                        background-position: center;
+                    }
+                    
+                    .task-text {
+                        flex: 1;
+                        color: var(--text-color);
+                        justify-content: flex-start;
+                        font-size: 14px;
+                        word-break: break-all;
+                        margin: 10px 0;
+                    }
+
+                    /* Modificando el texto al completar la tarea (marcar el checkbox) */
+                    .task-checkbox:checked + .task-text {
+                        color: var(--secondary-text-color);
+                        font-style: italic;
+                        text-decoration: line-through;
+                    }
+
+                    /* Botones (contenido) de cada task-div */
+                    .add-task-button, .remove-task-button, .edit-task-button, .task-input {
+                        border: none;
+                        background-color: inherit;
+                        color: var(--secondary-text-color);
+                        border-radius: 5px;
+                        padding: 5px;
+                        margin: 5px 5px;
+                    }
+
+                    /* Para que no se centre todo el contenido si la tarea es muy corta */
+                    .task-input {
+                        width: 90%;
+                    }
+
+                    .task-input:focus {
+                        outline: none;
+                    }
+
+                    /* Los botones no serán visibles a menos que el usuario pase el cursor sobre la tarea */
+                    .add-task-button, .remove-task-button, .edit-task-button {
+                        opacity: 0;
+                    }
+
+                    /* Mostrar los botones al hacer hover en el div de la tarea */
+                    .task-div:hover .add-task-button,
+                    .task-div:hover .remove-task-button,
+                    .task-div:hover .edit-task-button {
+                        opacity: 1; /* Mostrar botones */
+                    }
+
+                    .add-task-button:hover, .remove-task-button:hover, .edit-task-button:hover{
+                        background-color: var(--main-purple);
+                    }
                         
                 .stats-div {
                     background-color: var(--section-color);
