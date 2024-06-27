@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 
@@ -25,6 +25,9 @@ db.init_app(app)
 
 # Para Aplicaciones Simples: db = SQLAlchemy(app) es más directo y fácil de usar.
 # Para Aplicaciones Más Complejas o Modulares: db = SQLAlchemy() seguido de db.init_app(app) proporciona mayor flexibilidad y modularidad.
+
+# Variable global para almacenar el ID de sesión
+global_session_id = None
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -53,6 +56,48 @@ def register():
         db.session.add(new_user)
         db.session.commit()
         return jsonify({'message': 'Usuario registrado exitosamente.'}), 200
+
+@app.route("/login", methods=['POST', 'GET'])
+def login():
+    global global_session_id
+    if request.method == 'POST':
+        data = request.get_json() # Obtengo el 'body' de la data que extraigo del formulario, la que 'postea' el usuario al hacer submit
+        email = data.get('email') # 'Abro' data y le saco cada campo ya que es un json
+        password = data.get('password')
+    
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            if bcrypt.check_password_hash(existing_user.password, password):
+                # Al iniciar sesión con éxito:
+
+                # Ahora la variable global que tiene el id del usuario es la del usuario que acaba de iniciar sesión
+                global_session_id = existing_user.id
+                return jsonify({'message': 'Iniciando Sesión.', 'sessionID': existing_user.id}), 200
+            else:
+                return jsonify({'error': 'Contraseña incorrecta.'}), 400
+        else:
+            return jsonify({'error': 'No existe ningún usuario registrado con este email.'}), 400
+        
+
+@app.route("/dashboard", methods=['GET'])
+def dashboard():
+    global global_session_id
+    session_id = request.args.get('sessionID')
+
+    # Si el usuario ingresa una ID manualmente en la URL o si no inició sesión aún
+    if global_session_id is None or str(global_session_id) != session_id:
+        return jsonify({'error': 'No autorizado. Debes iniciar sesión para acceder a esta página. Redirigiendo a /login'}), 401
+
+    user = User.query.filter_by(id=session_id).first()
+    return jsonify({'message': 'Bienvenido al dashboard.', 'user_id': user.id, 'username': user.username}), 200
+
+@app.route("/verify_session/<int:session_id>")
+def verify_session(ession_id):
+    response = {"Logged": False}
+    user = User.query.get(ession_id)
+    if user:
+        response["Logged"] = True
+    return jsonify(response)
 
 if __name__ == "__main__":
     with app.app_context(): # Para sólo crear las tablas si no existen.

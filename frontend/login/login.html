@@ -27,7 +27,7 @@
                 <input id="user" class="login-input" type="text" placeholder="Usuario">
                 <input id="password" class="login-input"  type="password" placeholder="Contraseña">
                 <input id="login-button" class="login-button" type="submit" value="INGRESAR">
-                <p>¿No tienes una cuenta? <a href="/register/register.html">Regístrate.</a></p>
+                <p>¿No tienes una cuenta? <a href="/register/">Regístrate.</a></p>
             </form>
         </div>
     </div>
@@ -38,20 +38,49 @@
 
             // Obtener los valores de los campos de usuario y contraseña
             // el .trim() es para obtener el dato del input sin espacios en blanco accidentales y evitar errores más adelante en la validación de datos.
-            const user = document.getElementById("user").value.trim();
+            const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value.trim();
 
-            // Validar que los datos sean correctos
-            if (user === 'Bren' && password === "1234") {
-                // Redirigir a otra página (ajusta la URL según sea necesario)
-                window.location.href = './../dashboard/dashboard.html';
-            } else {
-                errorMessage = document.getElementById("invalid-data-message");
+            const errorMessage = document.getElementById("invalid-data-message");
+
+            if (!email || !password) {
+                errorMessage.textContent = "Por favor, completa todos los campos!";
                 errorMessage.style.opacity = 1;
 
                 // limpiamos los campos para un nuevo intento
                 document.getElementById("password").value = "";
-                document.getElementById("user").value = "";
+                document.getElementById("email").value = "";
+            } else {
+                // Si el usuario completa todos los campos, comenzamos con el fetch. Enviamos mail y contraseña al servidor back para que consulte a la base de datos y se fije si existe una cuenta registrada con ese mail, y, de ser así, que se fije si la contraseña que recibió del usuario le corresponde a la que está asociada a ese mail en la base de datos.
+
+                // Si pasa las validaciones, crea un objeto con los datos del formulario
+                const formData = {
+                    email: email,
+                    password: password,
+                };
+
+                // Envía los datos al servidor backend usando fetch
+                fetch('http://localhost:5000/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => response.json()) 
+                .then(data => {
+                    if (data.message === 'Iniciando Sesión.') { // este fetch, de ser exitoso, devuelve la id de la sesión (variable global)
+
+                        localStorage.setItem('sessionID', data.sessionID);
+
+                        // Si todo sale bien y el inicio de sesión es exxitoso, redirige al dashboard del usuario
+                        window.location.href = `http://localhost:8000/dashboard?sessionID=${data.sessionID}`;
+                    } else {
+                        throw new Error(data.error);
+                    }
+                })
+                .catch(error => {
+                    errorMessage.textContent = error.message;
+                    errorMessage.style.opacity = 1;
+                });
             }
         });
     </script>
