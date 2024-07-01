@@ -26,6 +26,7 @@ db.init_app(app)
 # Para Aplicaciones Simples: db = SQLAlchemy(app) es más directo y fácil de usar.
 # Para Aplicaciones Más Complejas o Modulares: db = SQLAlchemy() seguido de db.init_app(app) proporciona mayor flexibilidad y modularidad.
 
+# --------------------------------- login/register ----------------------------------- #
 # Variable global para almacenar el ID de sesión
 global_session_id = None
 
@@ -78,7 +79,6 @@ def login():
         else:
             return jsonify({'error': 'No existe ningún usuario registrado con este email.'}), 400
         
-
 @app.route("/dashboard", methods=['GET'])
 def dashboard():
     global global_session_id
@@ -91,6 +91,65 @@ def dashboard():
     user = User.query.filter_by(id=session_id).first()
     return jsonify({'message': 'Bienvenido al dashboard.', 'user_id': user.id, 'username': user.username}), 200
 
+# --------------------------------- to-do's ----------------------------------- #
+@app.route("/add_task", methods=['POST'])
+def add_task():
+    data = request.get_json() # convertimos a tareaDara en json
+
+    # Crear una nueva tarea
+    nueva_tarea = Task( # se añade un registro con tareaData (data) a la tabla Task
+        task_text=data.get('task_text'),
+        completed=data.get('completed'),
+        user_id=data.get('user_id')
+    )
+
+    db.session.add(nueva_tarea)
+    db.session.commit()
+
+    return jsonify({'message': 'Tarea agregada exitosamente.', 'task_id': nueva_tarea.id}), 200
+
+@app.route("/delete_task/<int:task_id>", methods=['DELETE'])
+def delete_task(task_id):
+    # Buscar la tarea por ID en la base de datos
+    tarea_a_eliminar = Task.query.get(task_id)
+
+    # Eliminar la tarea de la base de datos
+    db.session.delete(tarea_a_eliminar)
+    db.session.commit()
+    return jsonify({'message': 'Tarea eliminada correctamente.'}), 200
+
+@app.route("/edit_task/<int:task_id>", methods=['PUT'])
+def edit_task(task_id):
+    data = request.get_json()
+
+    # Buscar la tarea por ID en la base de datos
+    tarea_a_editar = Task.query.get(task_id)
+
+    # Actualizar los datos de la tarea
+    tarea_a_editar.task_text = data.get('task_text')
+    db.session.commit()
+    return jsonify({'message': 'Tarea editada correctamente.'}), 200
+
+@app.route("/complete_task/<int:task_id>", methods=['PUT'])
+def complete_task(task_id):
+    tarea_a_completar = Task.query.get(task_id) # buscamos la tarea
+
+    tarea_a_completar.completed = request.json.get('completed') # obtiene el valor de la clave completed del cuerpo JSON de la solicitud (true o false). Este valor se asigna al atributo completed de la tarea (tarea_a_completar).
+    db.session.commit()
+    return jsonify({'message': 'Estado de tarea actualizado correctamente.'}), 200
+
+@app.route("/get_tasks", methods=['GET'])
+def get_tasks():
+    session_id = request.args.get('sessionID')
+    user = User.query.filter_by(id=session_id).first()
+
+    tasks = Task.query.filter_by(user_id=user.id).all()
+    tasks_list = [{'id': task.id, 'task_text': task.task_text, 'completed': task.completed} for task in tasks]
+
+    return jsonify({'tasks': tasks_list}), 200
+
+
+# --------------------------------- details ----------------------------------- #
 @app.route("/user_info", methods=['GET'])
 def user_info():
     session_id = request.args.get('sessionID')

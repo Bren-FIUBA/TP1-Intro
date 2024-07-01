@@ -276,7 +276,7 @@ body {
                     }
 
                     /* Botones (contenido) de cada task-div */
-                    .add-task-button, .remove-task-button, .edit-task-button, .task-input {
+                    .confirm-task-button, .confirm-edit-button, .remove-task-button, .edit-task-button, .task-input {
                         border: none;
                         background-color: inherit;
                         color: var(--secondary-text-color);
@@ -295,18 +295,19 @@ body {
                     }
 
                     /* Los botones no serán visibles a menos que el usuario pase el cursor sobre la tarea */
-                    .add-task-button, .remove-task-button, .edit-task-button {
+                    .confirm-task-button, .confirm-edit-button, .remove-task-button, .edit-task-button {
                         opacity: 0;
                     }
 
                     /* Mostrar los botones al hacer hover en el div de la tarea */
-                    .task-div:hover .add-task-button,
+                    .task-div:hover .confirm-task-button,
+                    .task-div:hover .confirm-edit-button,
                     .task-div:hover .remove-task-button,
                     .task-div:hover .edit-task-button {
                         opacity: 1; /* Mostrar botones */
                     }
 
-                    .add-task-button:hover, .remove-task-button:hover, .edit-task-button:hover{
+                    .confirm-task-button:hover, .confirm-edit-button:hover .remove-task-button:hover, .edit-task-button:hover{
                         background-color: var(--main-purple);
                     }
                         
