@@ -20,7 +20,7 @@
             <h3>
                 MindSpace
             </h3>
-            <form id="register-form">
+            <form id="register-form" method="POST" action="/register">
                 <p id="error-message">error-message</p>
                 <input class="register-input" id="user" type="text" placeholder="Crear usuario">
                 <input class="register-input" id="username" type="text" placeholder="Nombre/Apodo">
@@ -34,17 +34,17 @@
     </div>
     <script>
         document.getElementById("register-form").addEventListener("submit", function(event) {
-            event.preventDefault(); // Evita el envío del formulario por defecto
+            event.preventDefault()
 
             // Guardo los datos del form en constantes
-            const email = document.getElementById("email").value.trim();
-            const userName = document.getElementById("username").value.trim();
+            const email = document.getElementById("user").value.trim();
+            const username = document.getElementById("username").value.trim();
             const password = document.getElementById("password").value.trim();
             const confirmPassword = document.getElementById("confirm-password").value.trim();
 
             const errorMessage = document.getElementById("error-message");
 
-            if (!email || !userName || !password || !confirmPassword) {
+            if (!email || !username || !password || !confirmPassword) {
                 errorMessage.textContent = "Por favor, completa todos los campos!";
                 errorMessage.style.opacity = 1;
                 return;
@@ -57,7 +57,7 @@
             // Si pasa las validaciones, crea un objeto JS con los datos del formulario
             const formData = {
                 email: email,
-                username: userName,
+                username: username,
                 password: password,
                 confirm_password: confirmPassword,
             };
@@ -72,7 +72,7 @@
             })
             .then(response => { // La respuesta se define en app.py, acá actuamos según el contenido de esa respuesta
                 if (response.ok) { // La ruta es relativa, debe ir 1 para atrás, carpeta login en lugar de register, y login.html
-                    window.location.href = './../login/login.html'; // Redirige a la página de inicio de sesión si el registro es exitoso
+                    window.location.href = '/login/'; // Redirige a la página de inicio de sesión si el registro es exitoso
                 } else {
                     return response.json().then(data => { throw new Error(data.error) });
                     // El segundo .then toma el json que devuelve app.py cuando ocurre el error de que ya existe un usuario registrado con ese email, y devuelve literalmente el texto o mensaje asociado a ese error.

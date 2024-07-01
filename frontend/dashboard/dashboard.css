@@ -24,7 +24,7 @@ body {
 .container {
     margin: auto;
     background-color: var(--board-color);
-    width: 85%;
+    width: 95%;
     height: 93vh;
     border-radius: 10px;
     display: flex;
@@ -89,13 +89,9 @@ body {
         box-shadow: 0 3px 10px rgba(7,7,7, 0.8);
     }
 
-        .date-header {
+        .greeting-message {
             color: var(--primary-text-color);
             font-weight: lighter;
-        }
-
-        .day-text {
-            font-weight: bold;
         }
 
         .date-info-header {
@@ -355,7 +351,7 @@ body {
             justify-content: center;
             text-align: center;
             font-weight: bold;
-            font-size: 30px;
+            font-size: 40px;
             box-shadow: 0 3px 10px rgba(7,7,7, 0.8);
         }
 

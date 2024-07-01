@@ -9,7 +9,7 @@ from models import db, User, Task, DailyGoal
 app = Flask(__name__)
 
 # Hay que configurar CORS para permitir que el servidor front-end (que está en localhost:8000) pueda hacer peticiones al servidor Flask (que está en localhost:5000). Ésta línea aplica CORS a toda la aplicación Flask, permitiendo que cualquier origen (*) pueda realizar peticiones.
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "http://localhost:8000"}})
 
 bcrypt = Bcrypt(app)
 
@@ -91,13 +91,15 @@ def dashboard():
     user = User.query.filter_by(id=session_id).first()
     return jsonify({'message': 'Bienvenido al dashboard.', 'user_id': user.id, 'username': user.username}), 200
 
-@app.route("/verify_session/<int:session_id>")
-def verify_session(ession_id):
-    response = {"Logged": False}
-    user = User.query.get(ession_id)
-    if user:
-        response["Logged"] = True
-    return jsonify(response)
+@app.route("/user_info", methods=['GET'])
+def user_info():
+    session_id = request.args.get('sessionID')
+    user = User.query.filter_by(id=session_id).first()
+
+    if not user:
+        return jsonify({'error': 'Usuario no encontrado.'}), 404
+
+    return jsonify({'user': {'username': user.username}}), 200
 
 if __name__ == "__main__":
     with app.app_context(): # Para sólo crear las tablas si no existen.
