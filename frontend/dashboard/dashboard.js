@@ -1,53 +1,46 @@
-// --------------------- login / sesión de usuarios ---------------------
-const urlParams = new URLSearchParams(window.location.search);
+var daily_goals_fetched;
 
-// tomamos el ID de la URL
-const sessionID = urlParams.get('sessionID');
-
-// tomamos el ID almacenado como variable global en app.py, el id de la sesión
-const storedSessionID = localStorage.getItem('sessionID');
-
-if (storedSessionID !== sessionID) {
-    console.log("El usuario no está autenticado, redirigiendo a login.");
-        window.location.href = "http://localhost:8000/login/";
-} else { // Si el usuario sí inició sesión, lo lleva al dashboard
-    fetch(`http://127.0.0.1:5000/dashboard?sessionID=${sessionID}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            console.log(data.error);
-                window.location.href = "http://localhost:8000/login/";
-        } else {
-            console.log("Bienvenido al dashboard:", data);
-            // acá cargaría la data del usuario
-        }
-    })
-    .catch(error => {
-        console.error("Error al cargar el dashboard:", error);
-            window.location.href = "http://localhost:8000/login/";
-    });
-}
-
-// --------------------- main ---------------------
 document.addEventListener("DOMContentLoaded", function() {
-    fetchUserInfo(); // Llama a una función para obtener datos del usuario al cargar la página
-    updateDate(); // actualiza la fecha al cargar la página
-    updateClock(); // actualiza el reloj al cargar la página
-    fetchTasks();
+    getTasks();
+    getDailyGoals();
+    daily_goals_fetched = true;
 });
 
-window.onload = function() {
-    updateDate(); // Actualizar la fecha al recargar la página
-};
+// ---------------------------------- Handle Views ----------------------------------
+// Función para mostrar el main-div y ocultar daily-goals-config-div
+function showMainDiv() {
+    const mainDiv = document.getElementById('main-div');
+    const configDiv = document.getElementById('daily-goals-config-div');
+    mainDiv.style.display = 'flex';
+    configDiv.style.display = 'none';
+    if (!daily_goals_fetched) { 
+        location.reload()
+        daily_goals_fetched = true;
+    }
+}
 
+// Función para mostrar daily-goals-config-div y ocultar main-div
+function showDailyGoalsConfig() {
+    const mainDiv = document.getElementById('main-div');
+    const configDiv = document.getElementById('daily-goals-config-div');
+    mainDiv.style.display = 'none';
+    configDiv.style.display = 'flex';
+    configDiv.style.visibility = 'visible';
+    configDiv.style.height = '100%';
 
-// --------------------- to-do's ---------------------
+    const goalsContainer = document.getElementById('daily-goals-config-card');
+    goalsContainer.style.padding = '10px'; // Ajusta el padding según necesites
+    goalsContainer.style.overflowY = 'auto'; // Añade overflow-y para la scrollbar si es necesario
+    goalsContainer.style.scrollbarWidth = 'thin';
+    goalsContainer.style.scrollbarColor = 'transparent transparent'
+    goalsContainer.style.transition.scrollbarColor = '0.3s ease';
+    getGoals();
+}
+
+// ---------------------------------- To-do's ----------------------------------
 let agregandoTarea = false;
 
-function fetchTasks() {
+function getTasks() {
     const sessionID = localStorage.getItem('sessionID');
     fetch(`http://127.0.0.1:5000/get_tasks?sessionID=${sessionID}`)
         .then(response => response.json())
@@ -56,14 +49,13 @@ function fetchTasks() {
                 console.error(data.error);
                 return;
             }
-            displayTasks(data.tasks); // Si obtiene las tareas, las muestra. Devolvería un JSON con las tareas.
+            displayTasks(data.tasks); // Si obtiene las tareas exitosamente, las muestra. Este fetch devolvería un JSON con las tareas.
         })
         .catch(error => {
             console.error('Error al obtener las tareas:', error);
         });
 }
 
-// Función que muestra las tareas (recibe el contenido de las tareas al que el fetch hace request)
 function displayTasks(tasks) {
     const tasksContainer = document.querySelector(".tasks-container");
 
@@ -78,7 +70,7 @@ function displayTasks(tasks) {
         let checkbox = crearCheckbox();
         checkbox.checked = task.completed; // cargar el estado de la tarea guardado en la base de datos
         checkbox.addEventListener('change', function() {
-            marcarCheckbox(task.id, checkbox.checked);
+            marcarCheckboxTarea(task.id, checkbox.checked);
         });
 
         // Crear un p para mostrar el texto de la tarea
@@ -317,8 +309,9 @@ function removerTarea(taskDiv) {
     agregandoTarea = false;
 }
 
-function marcarCheckbox(taskId, completed) {
+function marcarCheckboxTarea(taskId, completed) {
     const tareaData = {
+        task_id: taskId,
         completed: completed
     };
 
@@ -368,94 +361,344 @@ function agregarDivTarea() {
     taskDiv.scrollIntoView({ behavior: "smooth", block: "end" });
 }
 
-// --------------------------- SALUDO, FECHA, RELOJ ---------------------------
+// ---------------------------------- Goals (config) ----------------------------------
+let agregandoObjetivo = false;
 
-// > SALUDO
-// Obtenemos el nombre del usuario (para saludarlo/a)
-function fetchUserInfo() {
+function getGoals() {
     const sessionID = localStorage.getItem('sessionID');
-    fetch(`http://127.0.0.1:5000/user_info?sessionID=${sessionID}`)
+    fetch(`http://127.0.0.1:5000/get_goals?sessionID=${sessionID}`)
         .then(response => response.json())
         .then(data => {
             if (data.error) {
                 console.error(data.error);
                 return;
             }
-            displayGreetingMessage(data.user); // Si obtiene la información del usuario exitosamente, muestra el saludo personalizado.
+            displayGoals(data.goals); // Si obtiene los objetivos exitosamente, los muestra. Este fetch devolvería un JSON con los objetivos.
         })
         .catch(error => {
-            console.error('Error al obtener la información del usuario:', error);
+            console.error('Error al obtener los objetivos:', error);
         });
 }
 
-function displayGreetingMessage(user) {
-    const usernameSpan = document.querySelector("#username");
+function displayGoals(goals) {
+    const goalsContainer = document.querySelector("#goals-container");
 
-    usernameSpan.textContent = user.username;
+    // Limpiar contenedor de objetivos antes de agregar nuevos elementos
+    goalsContainer.innerHTML = "";
 
-    const saludo = getSaludo();
-    const greetingMessage = document.querySelector(".greeting-message");
-    greetingMessage.textContent = `${saludo}, ${user.username}.`;
-}
+    // Iteramos sobre cada objetivo y los mostramos en pantalla.
+    for (let i = 0; i < goals.length; i++) {
+        let goal = goals[i];
+        let goalDiv = document.createElement("div");
+        goalDiv.setAttribute("class", "goal-div");
+        goalDiv.setAttribute("data-goal-id", goal.id); // Almacenar el ID del objetivo
 
-function getSaludo() {
-    const hora = new Date().getHours(); // Obtenemos la hora actual
-    let saludo;
-    if (hora >= 5 && hora < 12) {
-        saludo = "Buen día";
-    } else if (hora >= 12 && hora < 19) {
-        saludo = "Buenas tardes";
-    } else {
-        saludo = "Buenas noches";
-    }
-    return saludo;
-}
+        // Crear un p para mostrar el texto del objetivo
+        let objetivoTexto = document.createElement("p");
+        objetivoTexto.textContent = goal.goal;
+        objetivoTexto.setAttribute("class", "goal-text");
 
+        // Crear el botón para editar el objetivo
+        let editarObjetivoButton = crearEditarGoalButton(goalDiv, objetivoTexto);
 
-// > RELOJ
-// Función para actualizar el reloj
-function updateClock() {
-    var currentTime = new Date();
-    var hours = currentTime.getHours();
-    var minutes = currentTime.getMinutes();
-    var period;
+        // Crear el botón para eliminar el objetivo
+        let removerObjetivoButton = crearRemoveGoalButton(goalDiv);
 
-    // Determina si es AM o PM
-    if (hours >= 12) { period = 'PM' } 
-    else { period = 'AM' }
+        // Appenddeamos todo al div
+        goalDiv.append(objetivoTexto);
+        goalDiv.append(editarObjetivoButton);
+        goalDiv.append(removerObjetivoButton);
 
-    // Convierte a formato de 12 horas
-    hours = hours % 12;
-    if (hours === 0) { hours = 12 } // La hora '0' debería ser '12' en formato 12 horas
-
-    // Formatea los minutos para asegurar dos dígitos
-    var minutesFormatted;
-    if (minutes < 10) { minutesFormatted = '0' + minutes } 
-    else { minutesFormatted = minutes.toString() }
-
-    // Actualiza el contenido del span con ID 'clock'
-    var clockElement = document.getElementById('clock');
-    clockElement.textContent = `${hours}:${minutesFormatted} ${period}`;
-}
-
-// > FECHA
-function updateDate() {
-    var currentDate = new Date();
-    var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    var formattedDate = currentDate.toLocaleDateString('es-ES', options);
-
-    var dateElement = document.getElementById('current-date');
-    if (dateElement) {
-        dateElement.textContent = formattedDate;
+        // Appenddeamos el goalDiv que contiene todos los elementos al goalsContainer
+        goalsContainer.append(goalDiv);
     }
 }
 
-// Actualizar el reloj cada segundo
-setInterval(function() {
-    updateClock();
-}, 1000);
+function crearGoalsInput() {
+    let objetivo = document.createElement("input");
+    objetivo.type = "text";
+    objetivo.setAttribute("class", "goal-input");
+    return objetivo;
+}
 
-// Actualizar la fecha cada hora. Para una mejor experiencia, de todas maneras se actualizará cuando el usuario recargue la página.
-setInterval(function() {
-    updateDate();
-}, 3600000);
+function crearConfirmGoalButton(goalDiv) {
+    let confirmarObjetivoButton = document.createElement("input");
+    confirmarObjetivoButton.type = "button";
+    confirmarObjetivoButton.value = "✔️";
+    confirmarObjetivoButton.setAttribute("class", "confirm-goal-button");
+    confirmarObjetivoButton.onclick = function() {
+        let objetivoInput = goalDiv.querySelector(".goal-input");
+        confirmarObjetivo(goalDiv, objetivoInput);
+    };
+    return confirmarObjetivoButton;
+}
+
+function crearConfirmEditGoalButton(goalDiv) {
+    let confirmarEdicionButton = document.createElement("input");
+    confirmarEdicionButton.type = "button";
+    confirmarEdicionButton.value = "✔️";
+    confirmarEdicionButton.setAttribute("class", "confirm-goal-button");
+    confirmarEdicionButton.onclick = function() {
+        let objetivoInput = goalDiv.querySelector(".goal-input");
+        confirmGoalEdit(goalDiv, objetivoInput);
+    };
+    return confirmarEdicionButton;
+}
+
+function crearRemoveGoalButton(goalDiv) {
+    let removerObjetivoButton = document.createElement("input");
+    removerObjetivoButton.type = "button";
+    removerObjetivoButton.value = "❌";
+    removerObjetivoButton.setAttribute("class", "remove-goal-button");
+    removerObjetivoButton.onclick = function() {
+        removerObjetivo(goalDiv);
+    };
+    return removerObjetivoButton;
+}
+
+function crearTextoObjetivo(objetivoInput) {
+    let objetivoTexto = document.createElement("p");
+    objetivoTexto.textContent = objetivoInput.value;
+    objetivoTexto.setAttribute("class", "goal-text");
+    return objetivoTexto;
+}
+
+function crearEditarGoalButton(goalDiv, objetivoTexto) {
+    let editarObjetivoButton = document.createElement("input");
+    editarObjetivoButton.type = "button";
+    editarObjetivoButton.value = "✏️";
+    editarObjetivoButton.setAttribute("class", "edit-goal-button");
+    editarObjetivoButton.onclick = function() {
+        editarObjetivo(goalDiv, objetivoTexto);
+    };
+    return editarObjetivoButton;
+}
+
+function confirmarObjetivo(goalDiv, objetivoInput) {
+    // Verificar que el input no esté vacío
+    if (!objetivoInput.value.trim()) {
+        return; // si el input está vacío, no hace nada.
+    }
+
+    agregandoObjetivo = false;
+
+    //creo un objeto con los datos del objetivo que deben añadirse a la base de datos
+    const objetivoData = {
+        goal: objetivoInput.value.trim(), // Obtener el texto del objetivo
+        user_id: localStorage.getItem('sessionID') // Obtener el ID de usuario del localStorage
+    };
+
+    // Acá se agrega a la base de datos (fetch)
+    fetch('http://127.0.0.1:5000/add_goal', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(objetivoData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Objetivo agregado exitosamente:', data);
+        goalDiv.setAttribute('data-goal-id', data.goal_id);
+    })
+    .catch(error => {
+        console.error('Error al agregar objetivo:', error);
+    });
+
+    // Borramos y añadimos lo necesario
+    goalDiv.innerHTML = ""; // Borramos todo el contenido del div del objetivo
+
+    let objetivoTexto = crearTextoObjetivo(objetivoInput);
+    let editarButton = crearEditarGoalButton(goalDiv, objetivoTexto);
+    let removeButton = crearRemoveGoalButton(goalDiv);
+    
+    goalDiv.append(objetivoTexto); // Ahora le agregamos el texto plano del input
+    goalDiv.append(editarButton); // Agregamos el botón de editar objetivo
+    goalDiv.append(removeButton); // Agregamos el botón de eliminar objetivo
+    daily_goals_fetched = false;
+}
+
+function confirmGoalEdit(goalDiv, objetivoInput) {
+    if (!objetivoInput.value.trim()) {
+        return;
+    }
+
+    const goalId = goalDiv.getAttribute('data-goal-id');
+    const objetivoData = {
+        goal: objetivoInput.value.trim()  // Asegúrate de que el campo sea 'goal' para coincidir con el backend
+    };
+
+    fetch(`http://127.0.0.1:5000/edit_goal/${goalId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(objetivoData),
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log(`Objetivo con ID ${goalId} editado correctamente.`);
+            let objetivoTexto = goalDiv.querySelector('.goal-text');
+            objetivoTexto.textContent = objetivoInput.value.trim();
+        } else {
+            console.error('Error al intentar editar el objetivo desde el servidor.');
+            response.json().then(data => {
+                console.error('Detalles del error:', data);
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error al editar objetivo:', error);
+    });
+
+    goalDiv.innerHTML = ""; // Borramos todo el contenido del div del objetivo
+
+    let objetivoTexto = crearTextoObjetivo(objetivoInput);
+    let editarButton = crearEditarGoalButton(goalDiv, objetivoTexto);
+    let removeButton = crearRemoveGoalButton(goalDiv);
+
+    goalDiv.append(objetivoTexto);
+    goalDiv.append(editarButton);
+    goalDiv.append(removeButton);
+    daily_goals_fetched = false;
+}
+
+function editarObjetivo(goalDiv, objetivoTexto) {
+    if (agregandoObjetivo) return 
+    agregandoObjetivo = true;
+
+    goalDiv.innerHTML = ""; // Borramos todo el contenido del div del objetivo
+
+    // Volvemos a crear un input para editar objetivo
+    let nuevoInput = crearGoalsInput();
+    nuevoInput.value = objetivoTexto.textContent; // para no borrar el contenido a editar
+    let confirmEditButton = crearConfirmEditGoalButton(goalDiv, nuevoInput);
+    let removeButton = crearRemoveGoalButton(goalDiv);
+
+    goalDiv.append(nuevoInput);
+    goalDiv.append(confirmEditButton); // Agregamos el botón de editar objetivo
+    goalDiv.append(removeButton); // Agregamos el botón de eliminar objetivo
+
+    agregandoObjetivo = false;
+}
+
+function removerObjetivo(goalDiv) {
+    let goalId = goalDiv.getAttribute('data-goal-id');
+
+    fetch(`http://127.0.0.1:5000/delete_goal/${goalId}`, {
+        method: 'DELETE'
+    })
+    .then(response => response.ok && goalDiv.remove())
+    .catch(error => console.error('Error al eliminar objetivo:', error));
+    daily_goals_fetched = false;
+}
+
+function agregarDivObjetivo() {
+    if(agregandoObjetivo) {
+        return; // para no agregar más tareas hasta no terminar de ingresar una.
+    }
+    agregandoObjetivo = true; // hasta no terminar con todo lo de abajo (agregar la tarea o removerla), no se pueden agregar más tareas.
+    
+    const goalsContainer = document.querySelector("#goals-container");
+
+    // creamos div de cada tarea
+    let objetivoDiv = document.createElement("div");
+    objetivoDiv.setAttribute("class", "goal-div");
+
+    let input = crearGoalsInput()
+    let confirmarObjetivoButton = crearConfirmGoalButton(objetivoDiv)
+    let removerObjetivoButton = crearRemoveGoalButton(objetivoDiv)
+
+    objetivoDiv.append(input);
+    objetivoDiv.append(confirmarObjetivoButton);
+    objetivoDiv.append(removerObjetivoButton);
+
+    goalsContainer.append(objetivoDiv);
+
+    // Para que al agregar una tarea, el div "scrollee" y lleve al usuario a la nueva tarea.
+    objetivoDiv.scrollIntoView({ behavior: "smooth", block: "end" });
+
+    goalsContainer.appendChild(objetivoDiv);
+    agregandoObjetivo = false;
+}
+
+// ---------------------------------- Daily Goals ----------------------------------
+// Función para obtener y mostrar los objetivos diarios
+function getDailyGoals() {
+    const sessionID = localStorage.getItem('sessionID');
+    console.log("Fetching daily goals for session ID:", sessionID);
+    
+    fetch(`http://127.0.0.1:5000/get_daily_goals?sessionID=${sessionID}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Received data:", data);
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+            displayDailyGoals(data); // Si obtiene los objetivos diarios exitosamente, los muestra
+        })
+        .catch(error => {
+            console.error('Error al obtener los objetivos diarios:', error);
+        });
+}
+
+// Función para mostrar los objetivos diarios en el contenedor correspondiente
+function displayDailyGoals(daily_goals) {
+    const dailyGoalsContainer = document.querySelector(".daily-goals-container");
+
+    // Iteramos sobre cada objetivo diario y los mostramos en pantalla
+    for (let i = 0; i < daily_goals.length; i++) {
+        let dailyGoal = daily_goals[i];
+        let dailyGoalDiv = document.createElement("div");
+        dailyGoalDiv.setAttribute("class", "daily-goal-div");
+        dailyGoalDiv.setAttribute("data-daily-goal-id", dailyGoal.id); // Almacenar el ID del objetivo
+
+        // Crear un checkbox para marcar la tarea como completada
+        let checkbox = crearCheckbox();
+        checkbox.checked = dailyGoal.completed; // cargar el estado de la tarea guardado en la base de datos
+        checkbox.addEventListener('change', function() {
+            marcarCheckboxDailyGoal(dailyGoal.id, checkbox.checked);
+        });
+
+        // Crear un p para mostrar el texto del objetivo diario
+        let objetivoTexto = document.createElement("p");
+        objetivoTexto.textContent = dailyGoal.goal;
+        objetivoTexto.setAttribute("class", "daily-goal-text");
+
+        dailyGoalDiv.append(checkbox);
+        dailyGoalDiv.append(objetivoTexto);
+        dailyGoalsContainer.append(dailyGoalDiv);
+    }
+    console.log("Mostrando objetivos diarios.");
+}
+
+function marcarCheckboxDailyGoal(dailyGoalId, completed) {
+    const dailyGoalData = {
+        goal_id: dailyGoalId,
+        completed: completed
+    };
+
+    fetch(`http://127.0.0.1:5000/complete_daily_goal`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dailyGoalData),
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log(`Estado del objetivo diario con ID ${dailyGoalId} actualizado.`);
+        } else {
+            console.error('Error al actualizar estado del objetivo desde el servidor.');
+        }
+    })
+    .catch(error => {
+        console.error('Error al actualizar estado del objetivo:', error);
+    });
+}

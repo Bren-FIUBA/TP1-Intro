@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
     <link rel="stylesheet" href="dashboard.css">
-    <script src="dashboard.js"></script>
+    <script src="auth.js"></script>
 </head>
 
 <body>
     <div class="container">
         <nav class="navbar-div">
-            <button class="navbar-button">A</button>
-            <button class="navbar-button">B</button>
-            <button class="navbar-button">C</button>
+            <button class="navbar-button" id="home-button" onclick="showMainDiv()">🏠︎</button>
+            <button class="navbar-button" id="daily-goals-button" onclick="showDailyGoalsConfig()">⚙</button>
+            <button class="navbar-button" id="daily-goals-button">ⓘ</button>
         </nav>
 
-        <div class="main-div">
+        <div class="main-div" id="main-div">
             <header>
                 <h1 class="greeting-message">...<span id="username"></span></h1>
                 <h4 class="date-info-header" id="current-date">...</h4>
@@ -30,8 +30,11 @@
             <div class="board-div">
     
                 <div class="daily-goals-div">
-                    <div class="daily-goals-card"></div>
+                    <div class="daily-goals-container">
+                        <!--objetivos del usuario-->
+                    </div>
                 </div>
+
                 <div class="todo-and-stats-div">
                     
                     <div class="todo-div">
@@ -40,6 +43,7 @@
                         </div>
                         <input id="create-task-button" type="button" value="+" onclick="agregarDivTarea()">
                     </div>
+
                     <div class="stats-div">
 
                     </div>
@@ -47,17 +51,38 @@
     
             </div>
         </div>
+
+        <div class="main-div" id="daily-goals-config-div">
+            <header>
+                <h1 class="greeting-message">Administrador de Objetivos</h1>
+                <h4 class="date-info-header">Ten cuidado. Si eliminas un objetivo, perderás todo tu progreso.</h4>
+            </header>
+
+            <div class="daily-goals-card" id="daily-goals-config-card">
+                <div id="goals-container">
+
+                </div>
+                <input id="create-task-button" type="button" value="+" onclick="agregarDivObjetivo()">
+            </div>
+        </div>
     
         <div class="side-div">
     
             <div class="clock-div">
-                <p class="false-clock"><span id="clock">...</span></p>
+                <p class="false-clock"><span id="clock"></span></p>
             </div>
 
             <div class="sep"></div>
 
             <div class="calendar-div">
-
+                <div class="calendar-header">
+                    <button id="prev-month">&lt;</button>
+                    <h2 id="calendar-title">July 2024</h2>
+                    <button id="next-month">&gt;</button>
+                </div>
+                <div class="calendar-grid">
+                    <!-- Aquí se generará dinámicamente el calendario -->
+                </div>
             </div>
 
             <div class="sep"></div>
@@ -71,6 +96,7 @@
         
         </div>
     </div>
-
+    <script src="dashboard.js"></script>
+    <script src="widgets.js"></script>
 </body>
 </html>
