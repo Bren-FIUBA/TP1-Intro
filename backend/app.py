@@ -1,7 +1,8 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
-from datetime import date
+from datetime import date, datetime, timedelta
+from sqlalchemy import func
 
 # Importo los modelos de tablas que hice en el archivo models.py
 from models import db, User, Task, DailyGoal
@@ -33,7 +34,6 @@ db.init_app(app)
 
 # Variable global para almacenar el ID de sesión
 global_session_id = None
-
 
 @app.route("/register", methods=['POST'])
 def register():
@@ -221,14 +221,68 @@ def get_goals():
     return jsonify({'goals': goals_list}), 200
 
 # --------------------------------- daily goals --------------------------------- #
+@app.route("/create_daily_goal_records", methods=['POST'])
+def create_daily_goal_records():
+    session_id = request.json.get('sessionID')
+    user = User.query.filter_by(id=session_id).first()
+
+    # Obtener la última fecha de objetivos diarios del usuario
+    last_goal = DailyGoal.query.filter_by(user_id=user.id).order_by(DailyGoal.date.desc()).first()
+    last_date = last_goal.date if last_goal else date.today() - timedelta(days=1)
+
+    print(f'Última fecha de objetivos diarios: {last_date}')
+
+    # Crear registros diarios para cada día desde la última fecha de objetivos hasta hoy
+    current_date = last_date + timedelta(days=1)  # Empezamos desde el día siguiente al último registrado
+    while current_date <= date.today():
+        existing_goals = DailyGoal.query.filter_by(user_id=user.id, date=current_date).all()
+
+        if not existing_goals:
+            # Subconsulta para obtener el objetivo más antiguo para cada (user_id, goal)
+            subquery = db.session.query(
+                DailyGoal.goal,
+                DailyGoal.user_id,
+                func.min(DailyGoal.date).label('min_date')
+            ).filter_by(user_id=user.id).group_by(DailyGoal.goal, DailyGoal.user_id).subquery()
+
+            # Consulta principal para obtener los registros completos para el día actual
+            goals = db.session.query(DailyGoal).join(
+                subquery,
+                (DailyGoal.goal == subquery.c.goal) &
+                (DailyGoal.user_id == subquery.c.user_id) &
+                (DailyGoal.date == subquery.c.min_date)
+            ).all()
+
+            # Crear registros solo para los objetivos que aún no existen para el día actual
+            for goal in goals:
+                new_record = DailyGoal(
+                    goal=goal.goal,
+                    completed=False,
+                    user_id=user.id,
+                    date=current_date
+                )
+                db.session.add(new_record)
+
+        current_date += timedelta(days=1)
+
+    db.session.commit()
+
+    return jsonify({'message': 'Registros diarios creados.'}), 200
+
 @app.route("/get_daily_goals", methods=['GET'])
 def get_daily_goals():
     session_id = request.args.get('sessionID')
     user = User.query.filter_by(id=session_id).first()
 
-    # Obtener los objetivos diarios del usuario para el día actual
-    today = date.today()
-    daily_goals = DailyGoal.query.filter_by(user_id=user.id, date=today).order_by(DailyGoal.id).all()
+    # Obtener la fecha seleccionada desde el frontend (formato esperado: 'YYYY-MM-DD')
+    selected_date_str = request.args.get('selectedDate')
+    if selected_date_str:
+        selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+    else:
+        selected_date = datetime.today().date()
+
+    # Obtener los objetivos diarios del usuario para la fecha seleccionada
+    daily_goals = DailyGoal.query.filter_by(user_id=user.id, date=selected_date).order_by(DailyGoal.id).all()
 
     daily_goals_list = [{
         'id': goal.id,
@@ -239,11 +293,18 @@ def get_daily_goals():
 
     return jsonify(daily_goals_list), 200
 
+
 # Endpoint para marcar un objetivo diario como completado
 @app.route("/complete_daily_goal", methods=['POST'])
 def mark_daily_goal_completed():
     goal_id = request.json.get('goal_id')
     completed = request.json.get('completed')
+    selected_date = request.json.get('date')
+
+    if selected_date:
+        selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
+    else:
+        selected_date = datetime.now().date()
 
     daily_goal = DailyGoal.query.get(goal_id)
     if daily_goal:

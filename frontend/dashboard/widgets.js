@@ -8,6 +8,13 @@ window.onload = function() {
     updateDate(); // Actualizar la fecha al cargar la página
 };
 
+// Siempre actualizar la fecha seleccionada a la fecha actual al cargar la página
+localStorage.setItem('selectedDate', new Date().toISOString().split('T')[0]);
+
+function setSelectedDate(date) {
+    localStorage.setItem('selectedDate', date.toISOString().split('T')[0]);
+}
+
 // saludo
 function fetchUserInfo() {
     const sessionID = localStorage.getItem('sessionID');
@@ -108,7 +115,7 @@ function generateCalendar(year, month) {
 
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDayIndex = new Date(year, month, 1).getDay();
-    const today = currentDate.getDate();
+    const todayDate = new Date(); // Obtener la fecha actual dinámicamente
 
     const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
                         'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -126,7 +133,7 @@ function generateCalendar(year, month) {
     });
 
     // Crear casillas para los días del mes
-    for (let i = 0; i < firstDayIndex-1; i++) {
+    for (let i = 0; i < firstDayIndex - 1; i++) {
         const dayElement = document.createElement('div');
         calendarGrid.appendChild(dayElement);
     }
@@ -137,17 +144,30 @@ function generateCalendar(year, month) {
         dayElement.classList.add('calendar-day');
         
         dayElement.addEventListener('click', () => {
-            const selectedDate = new Date(year, month, day);
-            updateHeader(selectedDate);
+            const selected = new Date(year, month, day);
+            setSelectedDate(selected); // Actualiza la fecha en localStorage
+            let dailyGoalsContainer = document.querySelector(".daily-goals-container");
+            dailyGoalsContainer.innerHTML = "";
+            updateHeader(selected);
+            getDailyGoals(selected);
+
+            // Remover la clase 'today' de todos los elementos del calendario
+            document.querySelectorAll('.calendar-day').forEach(element => {
+                element.classList.remove('today');
+            });
+
+            // Añadir la clase 'today' solo al día seleccionado
+            dayElement.classList.add('today');
         });
 
-        // Resaltar el día actual
-        if (day === today && month === currentMonth && year === currentYear) {
+        // Resaltar el día actual dinámicamente
+        if (day === todayDate.getDate() && month === todayDate.getMonth() && year === todayDate.getFullYear()) {
             dayElement.classList.add('today');
         }
         calendarGrid.appendChild(dayElement);
     }
 }
+
 
 function changeHeaderDate(date) {
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };

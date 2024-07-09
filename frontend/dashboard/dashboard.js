@@ -1,10 +1,26 @@
 var daily_goals_fetched;
 
 document.addEventListener("DOMContentLoaded", function() {
+    const sessionID = localStorage.getItem('sessionID');
+
+    let selectedDate = new Date();
+    localStorage.setItem('selectedDate', selectedDate.toISOString().split('T')[0]);
+
+    updateHeader(selectedDate);
+
+    createDailyGoalRecords(sessionID);
+    getDailyGoals(selectedDate);
     getTasks();
-    getDailyGoals();
     daily_goals_fetched = true;
 });
+
+// Función de logout
+function logout() {
+    // Limpiar localStorage
+    localStorage.clear();
+    // Redirigir a la página de inicio de sesión u otra acción de cierre de sesión
+    window.location.href = 'http://localhost:8000/login/';
+}
 
 // ---------------------------------- Handle Views ----------------------------------
 // Función para mostrar el main-div y ocultar daily-goals-config-div
@@ -624,11 +640,15 @@ function agregarDivObjetivo() {
 
 // ---------------------------------- Daily Goals ----------------------------------
 // Función para obtener y mostrar los objetivos diarios
-function getDailyGoals() {
+function getDailyGoals(selectedDate = new Date()) {
     const sessionID = localStorage.getItem('sessionID');
-    console.log("Fetching daily goals for session ID:", sessionID);
-    
-    fetch(`http://127.0.0.1:5000/get_daily_goals?sessionID=${sessionID}`)
+    const year = selectedDate.getFullYear();
+    const month = ('0' + (selectedDate.getMonth() + 1)).slice(-2);
+    const day = ('0' + selectedDate.getDate()).slice(-2);
+    const formattedDate = `${year}-${month}-${day}`;
+    const url = `http://127.0.0.1:5000/get_daily_goals?sessionID=${sessionID}&selectedDate=${formattedDate}`;
+
+    fetch(url)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
@@ -636,21 +656,21 @@ function getDailyGoals() {
             return response.json();
         })
         .then(data => {
-            console.log("Received data:", data);
             if (data.error) {
                 console.error(data.error);
                 return;
             }
-            displayDailyGoals(data); // Si obtiene los objetivos diarios exitosamente, los muestra
+            displayDailyGoals(data);
         })
         .catch(error => {
-            console.error('Error al obtener los objetivos diarios:', error);
+            console.error('getDailyGoals: Error al obtener los objetivos diarios:', error);
         });
 }
 
 // Función para mostrar los objetivos diarios en el contenedor correspondiente
 function displayDailyGoals(daily_goals) {
     const dailyGoalsContainer = document.querySelector(".daily-goals-container");
+    dailyGoalsContainer.innerHTML = ""; // Limpiar el contenedor antes de agregar nuevos objetivos
 
     // Iteramos sobre cada objetivo diario y los mostramos en pantalla
     for (let i = 0; i < daily_goals.length; i++) {
@@ -675,16 +695,19 @@ function displayDailyGoals(daily_goals) {
         dailyGoalDiv.append(objetivoTexto);
         dailyGoalsContainer.append(dailyGoalDiv);
     }
-    console.log("Mostrando objetivos diarios.");
 }
 
 function marcarCheckboxDailyGoal(dailyGoalId, completed) {
+    let selectedDate = new Date(localStorage.getItem('selectedDate'));
     const dailyGoalData = {
         goal_id: dailyGoalId,
-        completed: completed
+        completed: completed,
+        date: selectedDate.toISOString().split('T')[0]
     };
 
-    fetch(`http://127.0.0.1:5000/complete_daily_goal`, {
+    const url = `http://127.0.0.1:5000/complete_daily_goal`;
+
+    fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -693,12 +716,37 @@ function marcarCheckboxDailyGoal(dailyGoalId, completed) {
     })
     .then(response => {
         if (response.ok) {
-            console.log(`Estado del objetivo diario con ID ${dailyGoalId} actualizado.`);
+            selectedDate = new Date(localStorage.getItem('selectedDate'));
+            getDailyProgress(selectedDate);
+            getWeeklyProgress(selectedDate);
         } else {
             console.error('Error al actualizar estado del objetivo desde el servidor.');
         }
     })
     .catch(error => {
         console.error('Error al actualizar estado del objetivo:', error);
+    });
+}
+
+function createDailyGoalRecords(sessionID) {
+    fetch('http://127.0.0.1:5000/create_daily_goal_records', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sessionID: sessionID }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error al crear registros diarios: ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log(data.message);
+        getDailyGoals(new Date()); // Actualiza la lista de objetivos diarios después de crear los registros
+    })
+    .catch(error => {
+        console.error('Error en la solicitud para crear registros diarios:', error);
     });
 }
