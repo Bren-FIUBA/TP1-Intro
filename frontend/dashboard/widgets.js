@@ -150,6 +150,8 @@ function generateCalendar(year, month) {
             dailyGoalsContainer.innerHTML = "";
             updateHeader(selected);
             getDailyGoals(selected);
+            getDailyProgress(selected);
+            getWeeklyProgress(selected);
 
             // Remover la clase 'today' de todos los elementos del calendario
             document.querySelectorAll('.calendar-day').forEach(element => {

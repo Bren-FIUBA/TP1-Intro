@@ -75,10 +75,20 @@ body {
     visibility: hidden;
     height: 0;
     overflow: hidden;
+    justify-content: center;
 }
 
 #daily-goals-config-card {
     padding: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+#create-goal-button {
+    display: block;
+    width: 95%;
+    height: 40px;
+    margin: auto;
 }
 
 .main-div {
@@ -199,7 +209,7 @@ body {
                     /* Todo el contenido del todo-div */
 
                     /* Botón de agregar tarea */
-                    #create-task-button, #create-goal-button {
+                    #create-task-button {
                         width: 95%;
                         border: none;
                         background-color: inherit;
@@ -334,14 +344,37 @@ body {
                         background-color: var(--main-purple);
                     }
                         
-                .stats-div {
-                    background-color: var(--section-color);
-                    width: 100%;
-                    height: 100%;
-                    border-radius: 5px;
-                    flex: 1;
-                    box-shadow: 0 3px 10px rgba(7,7,7, 0.8);
-                }
+                    .stats-div {
+                        flex: 1;
+                        display: flex;
+                        width: 100%;
+                        height: 100%; /* Ajusta la altura según tus necesidades */
+                        overflow: hidden;
+                        justify-content: space-between;
+                        gap: 10px;
+                    }
+
+                    #weekly-goals-stats-div {
+                        display: flex;
+                        border: 1px solid var(--main-purple);
+                        border-radius: 5px;
+                        flex: 3;
+                        padding: 10px;
+                        justify-content: center;
+                    }
+
+                    #daily-progress-div {
+                        display: flex;
+                        border: 1px solid var(--main-purple);
+                        border-radius: 5px;
+                        flex: 1;
+                        padding: 10px;
+                    }
+
+                    #weekly-progress-chart, #daily-progress-chart {
+                        width: 90%;
+                        height: 90%;
+                    }
 
 /* Side */
 .side-div {

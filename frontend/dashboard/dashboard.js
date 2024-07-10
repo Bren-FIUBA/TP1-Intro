@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     createDailyGoalRecords(sessionID);
     getDailyGoals(selectedDate);
+    getDailyProgress(selectedDate); // Obtiene el progreso diario para la fecha actual
+    getWeeklyProgress(selectedDate); // Obtiene el progreso semanal para la fecha actual
     getTasks();
     daily_goals_fetched = true;
 });
@@ -389,7 +391,7 @@ function getGoals() {
                 console.error(data.error);
                 return;
             }
-            displayGoals(data.goals); // Si obtiene los objetivos exitosamente, los muestra. Este fetch devolvería un JSON con los objetivos.
+            displayGoals(data.goals);
         })
         .catch(error => {
             console.error('Error al obtener los objetivos:', error);
@@ -402,32 +404,24 @@ function displayGoals(goals) {
     // Limpiar contenedor de objetivos antes de agregar nuevos elementos
     goalsContainer.innerHTML = "";
 
-    // Iteramos sobre cada objetivo y los mostramos en pantalla.
-    for (let i = 0; i < goals.length; i++) {
-        let goal = goals[i];
+    goals.forEach(goal => {
         let goalDiv = document.createElement("div");
         goalDiv.setAttribute("class", "goal-div");
         goalDiv.setAttribute("data-goal-id", goal.id); // Almacenar el ID del objetivo
 
-        // Crear un p para mostrar el texto del objetivo
         let objetivoTexto = document.createElement("p");
         objetivoTexto.textContent = goal.goal;
         objetivoTexto.setAttribute("class", "goal-text");
 
-        // Crear el botón para editar el objetivo
         let editarObjetivoButton = crearEditarGoalButton(goalDiv, objetivoTexto);
-
-        // Crear el botón para eliminar el objetivo
         let removerObjetivoButton = crearRemoveGoalButton(goalDiv);
 
-        // Appenddeamos todo al div
         goalDiv.append(objetivoTexto);
         goalDiv.append(editarObjetivoButton);
         goalDiv.append(removerObjetivoButton);
 
-        // Appenddeamos el goalDiv que contiene todos los elementos al goalsContainer
         goalsContainer.append(goalDiv);
-    }
+    });
 }
 
 function crearGoalsInput() {
@@ -491,20 +485,17 @@ function crearEditarGoalButton(goalDiv, objetivoTexto) {
 }
 
 function confirmarObjetivo(goalDiv, objetivoInput) {
-    // Verificar que el input no esté vacío
     if (!objetivoInput.value.trim()) {
-        return; // si el input está vacío, no hace nada.
+        return;
     }
 
     agregandoObjetivo = false;
 
-    //creo un objeto con los datos del objetivo que deben añadirse a la base de datos
     const objetivoData = {
-        goal: objetivoInput.value.trim(), // Obtener el texto del objetivo
-        user_id: localStorage.getItem('sessionID') // Obtener el ID de usuario del localStorage
+        goal: objetivoInput.value.trim(),
+        user_id: localStorage.getItem('sessionID')
     };
 
-    // Acá se agrega a la base de datos (fetch)
     fetch('http://127.0.0.1:5000/add_goal', {
         method: 'POST',
         headers: {
@@ -521,16 +512,16 @@ function confirmarObjetivo(goalDiv, objetivoInput) {
         console.error('Error al agregar objetivo:', error);
     });
 
-    // Borramos y añadimos lo necesario
-    goalDiv.innerHTML = ""; // Borramos todo el contenido del div del objetivo
+    goalDiv.innerHTML = "";
 
     let objetivoTexto = crearTextoObjetivo(objetivoInput);
     let editarButton = crearEditarGoalButton(goalDiv, objetivoTexto);
     let removeButton = crearRemoveGoalButton(goalDiv);
-    
-    goalDiv.append(objetivoTexto); // Ahora le agregamos el texto plano del input
-    goalDiv.append(editarButton); // Agregamos el botón de editar objetivo
-    goalDiv.append(removeButton); // Agregamos el botón de eliminar objetivo
+
+    goalDiv.append(objetivoTexto);
+    goalDiv.append(editarButton);
+    goalDiv.append(removeButton);
+
     daily_goals_fetched = false;
 }
 
@@ -541,10 +532,11 @@ function confirmGoalEdit(goalDiv, objetivoInput) {
 
     const goalId = goalDiv.getAttribute('data-goal-id');
     const objetivoData = {
-        goal: objetivoInput.value.trim()  // Asegúrate de que el campo sea 'goal' para coincidir con el backend
+        goal_id: goalId,
+        goal: objetivoInput.value.trim()
     };
 
-    fetch(`http://127.0.0.1:5000/edit_goal/${goalId}`, {
+    fetch(`http://127.0.0.1:5000/edit_goal`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -567,7 +559,7 @@ function confirmGoalEdit(goalDiv, objetivoInput) {
         console.error('Error al editar objetivo:', error);
     });
 
-    goalDiv.innerHTML = ""; // Borramos todo el contenido del div del objetivo
+    goalDiv.innerHTML = "";
 
     let objetivoTexto = crearTextoObjetivo(objetivoInput);
     let editarButton = crearEditarGoalButton(goalDiv, objetivoTexto);
@@ -576,39 +568,53 @@ function confirmGoalEdit(goalDiv, objetivoInput) {
     goalDiv.append(objetivoTexto);
     goalDiv.append(editarButton);
     goalDiv.append(removeButton);
+
     daily_goals_fetched = false;
 }
 
 function editarObjetivo(goalDiv, objetivoTexto) {
-    if (agregandoObjetivo) return 
-    agregandoObjetivo = true;
+    let objetivoInput = crearGoalsInput();
+    objetivoInput.value = objetivoTexto.textContent;
 
-    goalDiv.innerHTML = ""; // Borramos todo el contenido del div del objetivo
+    goalDiv.innerHTML = "";
 
-    // Volvemos a crear un input para editar objetivo
-    let nuevoInput = crearGoalsInput();
-    nuevoInput.value = objetivoTexto.textContent; // para no borrar el contenido a editar
-    let confirmEditButton = crearConfirmEditGoalButton(goalDiv, nuevoInput);
-    let removeButton = crearRemoveGoalButton(goalDiv);
+    let confirmarEdicionButton = crearConfirmEditGoalButton(goalDiv);
+    let removerObjetivoButton = crearRemoveGoalButton(goalDiv);
 
-    goalDiv.append(nuevoInput);
-    goalDiv.append(confirmEditButton); // Agregamos el botón de editar objetivo
-    goalDiv.append(removeButton); // Agregamos el botón de eliminar objetivo
-
-    agregandoObjetivo = false;
+    goalDiv.append(objetivoInput);
+    goalDiv.append(confirmarEdicionButton);
+    goalDiv.append(removerObjetivoButton);
 }
 
 function removerObjetivo(goalDiv) {
-    let goalId = goalDiv.getAttribute('data-goal-id');
+    const goalId = goalDiv.getAttribute('data-goal-id');
 
-    fetch(`http://127.0.0.1:5000/delete_goal/${goalId}`, {
-        method: 'DELETE'
+    fetch(`http://127.0.0.1:5000/delete_goal`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ goal_id: goalId }),
     })
-    .then(response => response.ok && goalDiv.remove())
-    .catch(error => console.error('Error al eliminar objetivo:', error));
+    .then(response => {
+        if (response.ok) {
+            console.log(`Objetivo con ID ${goalId} eliminado correctamente.`);
+            goalDiv.remove();
+        } else {
+            console.error('Error al intentar eliminar el objetivo desde el servidor.');
+            response.json().then(data => {
+                console.error('Detalles del error:', data);
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error al eliminar objetivo:', error);
+    });
+
     daily_goals_fetched = false;
 }
 
+// Función para agregar un nuevo div de objetivo
 function agregarDivObjetivo() {
     if(agregandoObjetivo) {
         return; // para no agregar más tareas hasta no terminar de ingresar una.
@@ -621,9 +627,9 @@ function agregarDivObjetivo() {
     let objetivoDiv = document.createElement("div");
     objetivoDiv.setAttribute("class", "goal-div");
 
-    let input = crearGoalsInput()
-    let confirmarObjetivoButton = crearConfirmGoalButton(objetivoDiv)
-    let removerObjetivoButton = crearRemoveGoalButton(objetivoDiv)
+    let input = crearGoalsInput();
+    let confirmarObjetivoButton = crearConfirmGoalButton(objetivoDiv);
+    let removerObjetivoButton = crearRemoveGoalButton(objetivoDiv);
 
     objetivoDiv.append(input);
     objetivoDiv.append(confirmarObjetivoButton);
@@ -748,5 +754,125 @@ function createDailyGoalRecords(sessionID) {
     })
     .catch(error => {
         console.error('Error en la solicitud para crear registros diarios:', error);
+    });
+}
+
+// ---------------------------------- Gráficos ----------------------------------
+// Función para obtener el progreso semanal desde el backend y renderizar el gráfico
+function getWeeklyProgress(selectedDate = new Date()) {
+    const sessionID = localStorage.getItem('sessionID');
+    const formattedDate = selectedDate.toISOString().split('T')[0];
+    const url = `http://127.0.0.1:5000/weekly-progress?sessionID=${sessionID}&date=${formattedDate}`;
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            console.log("url a la que apunta getweeklyprogress: " + url)
+            return response.json();
+        })
+        .then(data => {
+            const maxYValue = data.length > 0 ? Math.max(...data.map(item => item.total_count)) : 0;
+            renderWeeklyProgressChart(data, maxYValue);
+        })
+        .catch(error => {
+            console.error('Error al obtener el progreso semanal:', error);
+        });
+}
+
+function renderWeeklyProgressChart(data, maxYValue) {
+    const ctx = document.getElementById('weekly-progress-chart').getContext('2d');
+
+    if (window.myChart) {
+        window.myChart.destroy();
+    }
+
+    // Configuración del gráfico usando Chart.js
+    window.myChart = new Chart(ctx, {
+        type: 'bar', // Tipo de gráfico (por ejemplo, barra)
+        data: {
+            labels: data.map(item => item.date), // Etiquetas del eje X (fechas)
+            datasets: [{
+                label: 'Objetivos Completados',
+                data: data.map(item => item.completed_count), // Datos del eje Y (cantidad)
+                backgroundColor: data.map(() => 'rgba(141, 92, 255, 0.6)'), // Color de fondo de las barras
+                borderColor: data.map(() => 'rgba(141, 92, 255, 1)'), // Color del borde de las barras
+                borderWidth: 1,
+            }]
+        },
+        options: {
+            responsive: true, // Hacer el gráfico responsivo
+            scales: {
+                y: {
+                    beginAtZero: true, // Empezar el eje Y en cero
+                    suggestedMax: maxYValue,
+                    stepSize: 1
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        display: false // Mostrar las etiquetas del eje X
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false // Ocultar la leyenda
+                }
+            }
+        }
+    });
+}
+
+function getDailyProgress(selectedDate = new Date()) {
+    const sessionID = localStorage.getItem('sessionID');
+    const formattedDate = selectedDate.toISOString().split('T')[0];
+    const url = `http://127.0.0.1:5000/daily-progress?sessionID=${sessionID}&date=${formattedDate}`;
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            console.log("url a la que apunta getdailyprogress: " + url)
+            return response.json();
+        })
+        .then(data => {
+            renderDailyProgressChart(data);
+        })
+        .catch(error => {
+            console.error('Error al obtener el progreso diario:', error);
+        });
+}
+
+// Función para renderizar el gráfico de progreso diario usando Chart.js
+function renderDailyProgressChart(data) {
+    const ctx = document.getElementById('daily-progress-chart').getContext('2d');
+
+    const totalGoals = data.total_goals || 1; // Evitar división por 0
+    const completedGoals = data.completed_goals;
+
+    if (window.myChart2) {
+        window.myChart2.destroy();
+    }
+
+    window.myChart2 = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Completados', 'Incompletos'],
+            datasets: [{
+                data: [completedGoals, totalGoals - completedGoals],
+                backgroundColor: ['rgba(141, 92, 255, 0.6)', 'rgba(14, 7, 31, 0.6)'],
+                borderColor: 'rgb(141, 92, 255)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
     });
 }

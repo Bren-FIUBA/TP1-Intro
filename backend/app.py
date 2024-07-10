@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, time
 from sqlalchemy import func
 
 # Importo los modelos de tablas que hice en el archivo models.py
@@ -175,7 +175,7 @@ def add_goal():
 
     # Crear un nuevo objetivo diario
     nuevo_objetivo = DailyGoal(
-        goal=data.get('goal'),  # Asegúrate de que 'goal_text' sea el nombre correcto del campo
+        goal=data.get('goal'),  # Asegúrate de que 'goal' sea el nombre correcto del campo
         completed=False,  # Ajusta según tus necesidades o el valor enviado desde el frontend
         user_id=data.get('user_id')
     )
@@ -185,37 +185,71 @@ def add_goal():
 
     return jsonify({'message': 'Objetivo agregado exitosamente.', 'goal_id': nuevo_objetivo.id}), 200
 
+@app.route("/delete_goal", methods=['DELETE'])
+def delete_goal():
+    goal_id = request.json.get('goal_id')
 
-@app.route("/delete_goal/<int:goal_id>", methods=['DELETE'])
-def delete_goal(goal_id):
-    # Buscar el objetivo por ID en la base de datos
-    objetivo_a_eliminar = DailyGoal.query.get(goal_id)
+    # Verificar si se proporcionó el ID del objetivo
+    if not goal_id:
+        return jsonify({'error': 'Missing goal_id parameter'}), 400
 
-    # Eliminar el objetivo de la base de datos
-    db.session.delete(objetivo_a_eliminar)
+    # Obtener el objetivo diario original
+    original_goal = DailyGoal.query.get(goal_id)
+    if not original_goal:
+        return jsonify({'error': 'Daily goal not found'}), 404
+
+    user_id = original_goal.user_id
+    original_goal_text = original_goal.goal
+
+    # Eliminar todos los registros con el texto del objetivo original
+    DailyGoal.query.filter_by(user_id=user_id, goal=original_goal_text).delete()
     db.session.commit()
-    return jsonify({'message': 'Objetivo eliminado correctamente.'}), 200
 
-@app.route("/edit_goal/<int:goal_id>", methods=['PUT'])
-def edit_goal(goal_id):
-    data = request.get_json()
+    return jsonify({'message': 'Daily goals deleted successfully'}), 200
 
-    # Buscar el objetivo por ID en la base de datos
-    objetivo_a_editar = DailyGoal.query.get(goal_id)
-    if not objetivo_a_editar:
-        return jsonify({'error': 'Objetivo no encontrado.'}), 404
+@app.route("/edit_goal", methods=['PUT'])
+def edit_goal():
+    goal_id = request.json.get('goal_id')
+    new_goal_text = request.json.get('goal')
 
-    # Actualizar los datos del objetivo
-    objetivo_a_editar.goal = data.get('goal')
+    # Obtener el objetivo diario original
+    original_goal = DailyGoal.query.get(goal_id)
+    if not original_goal:
+        return jsonify({'error': 'Daily goal not found'}), 404
+
+    user_id = original_goal.user_id
+    original_goal_text = original_goal.goal
+
+    # Actualizar todos los registros con el texto del objetivo original
+    DailyGoal.query.filter_by(user_id=user_id, goal=original_goal_text).update({"goal": new_goal_text})
     db.session.commit()
-    return jsonify({'message': 'Objetivo editado correctamente.'}), 200
+
+    return jsonify({'message': 'Daily goals updated successfully'}), 200
+
 
 @app.route("/get_goals", methods=['GET'])
 def get_goals():
     session_id = request.args.get('sessionID')
     user = User.query.filter_by(id=session_id).first()
 
-    goals = DailyGoal.query.filter_by(user_id=user.id).order_by(DailyGoal.id).all()
+    if not user:
+        return jsonify({'error': 'Usuario no encontrado.'}), 404
+
+    # Subconsulta para obtener el objetivo más antiguo para cada (user_id, goal)
+    subquery = db.session.query(
+        DailyGoal.goal,
+        DailyGoal.user_id,
+        func.min(DailyGoal.date).label('min_date')
+    ).filter_by(user_id=user.id).group_by(DailyGoal.goal, DailyGoal.user_id).subquery()
+
+    # Consulta principal para obtener los registros completos
+    goals = db.session.query(DailyGoal).join(
+        subquery,
+        (DailyGoal.goal == subquery.c.goal) &
+        (DailyGoal.user_id == subquery.c.user_id) &
+        (DailyGoal.date == subquery.c.min_date)
+    ).all()
+
     goals_list = [{'id': goal.id, 'goal': goal.goal, 'completed': goal.completed} for goal in goals]
 
     return jsonify({'goals': goals_list}), 200
@@ -313,6 +347,59 @@ def mark_daily_goal_completed():
         return jsonify({'message': 'Daily goal updated successfully'}), 200
     else:
         return jsonify({'error': 'Daily goal not found'}), 404
+
+# --------------------------------- gráficos --------------------------------- #
+@app.route('/weekly-progress', methods=['GET'])
+def get_weekly_progress():
+    session_id = request.args.get('sessionID')  # Obtener sessionID del query string
+    user = User.query.filter_by(id=session_id).first()
+
+    selected_date = request.args.get('date')
+
+    if selected_date:
+        selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
+    else:
+        selected_date = datetime.now().date()
+
+    week_start = selected_date - timedelta(days=6)
+    week_end = selected_date
+
+    weekly_progress = db.session.query(
+        func.date(DailyGoal.date),
+        func.count(DailyGoal.id).label('completed_count')
+    ).filter(
+        DailyGoal.date.between(week_start, week_end),
+        DailyGoal.user_id == user.id,
+        DailyGoal.completed == True
+    ).group_by(func.date(DailyGoal.date)).order_by(func.date(DailyGoal.date)).all()
+
+    progress_data = [{
+        'date': date.strftime('%Y-%m-%d'),
+        'completed_count': completed_count,
+        'total_count': db.session.query(func.count(DailyGoal.id)).filter_by(date=date, user_id=user.id).scalar()  # Usar date en lugar de selected_date
+    } for date, completed_count in weekly_progress]
+
+    return jsonify(progress_data)
+
+
+@app.route('/daily-progress', methods=['GET'])
+def get_daily_progress():
+    session_id = request.args.get('sessionID')  # Obtener sessionID del query string
+    user = User.query.filter_by(id=session_id).first()
+
+    selected_date = request.args.get('date')
+    if selected_date:
+        selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
+    else:
+        selected_date = datetime.now().date()
+
+    total_goals = db.session.query(func.count(DailyGoal.id)).filter_by(date=selected_date, user_id=user.id).scalar()
+    completed_goals = db.session.query(func.count(DailyGoal.id)).filter_by(date=selected_date, user_id=user.id, completed=True).scalar()
+
+    return jsonify({
+        'total_goals': total_goals,
+        'completed_goals': completed_goals
+    })
 
 
 if __name__ == "__main__":
