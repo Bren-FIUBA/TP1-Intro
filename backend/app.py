@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
-from datetime import date, datetime, timedelta, time
+from datetime import datetime, timedelta, time
 from sqlalchemy import func
+from pytz import utc
+import pytz
 
 # Importo los modelos de tablas que hice en el archivo models.py
 from models import db, User, Task, DailyGoal, Event
@@ -34,6 +36,10 @@ db.init_app(app)
 
 # Variable global para almacenar el ID de sesión
 global_session_id = None
+
+def get_current_date():
+    # Asumiendo que el servidor está en UTC
+    return datetime.now(utc).date()
 
 @app.route("/register", methods=['POST'])
 def register():
@@ -83,7 +89,6 @@ def login():
         else:
             return jsonify({'error': 'No existe ningún usuario registrado con este email.'}), 400
         
-
 @app.route("/dashboard", methods=['GET'])
 def dashboard():
     global global_session_id
@@ -262,13 +267,13 @@ def create_daily_goal_records():
 
     # Obtener la última fecha de objetivos diarios del usuario
     last_goal = DailyGoal.query.filter_by(user_id=user.id).order_by(DailyGoal.date.desc()).first()
-    last_date = last_goal.date if last_goal else date.today() - timedelta(days=1)
+    last_date = last_goal.date if last_goal else get_current_date() - timedelta(days=1)
 
     print(f'Última fecha de objetivos diarios: {last_date}')
 
     # Crear registros diarios para cada día desde la última fecha de objetivos hasta hoy
     current_date = last_date + timedelta(days=1)  # Empezamos desde el día siguiente al último registrado
-    while current_date <= date.today():
+    while current_date <= get_current_date():
         existing_goals = DailyGoal.query.filter_by(user_id=user.id, date=current_date).all()
 
         if not existing_goals:
@@ -313,7 +318,7 @@ def get_daily_goals():
     if selected_date_str:
         selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
     else:
-        selected_date = datetime.today().date()
+        selected_date = get_current_date()
 
     # Obtener los objetivos diarios del usuario para la fecha seleccionada
     daily_goals = DailyGoal.query.filter_by(user_id=user.id, date=selected_date).order_by(DailyGoal.id).all()
@@ -358,7 +363,7 @@ def get_weekly_progress():
     if selected_date:
         selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
     else:
-        selected_date = datetime.now().date()
+        selected_date = get_current_date()
 
     week_start = selected_date - timedelta(days=6)
     week_end = selected_date
@@ -390,7 +395,7 @@ def get_daily_progress():
     if selected_date:
         selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
     else:
-        selected_date = datetime.now().date()
+        selected_date = get_current_date()
 
     total_goals = db.session.query(func.count(DailyGoal.id)).filter_by(date=selected_date, user_id=user.id).scalar()
     completed_goals = db.session.query(func.count(DailyGoal.id)).filter_by(date=selected_date, user_id=user.id, completed=True).scalar()
@@ -440,7 +445,7 @@ def get_events():
     if selected_date_str:
         selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
     else:
-        selected_date = datetime.today()
+        selected_date = get_current_date()
 
     eventos = Event.query.filter_by(user_id=user.id, event_date=selected_date).all()
     eventos_list = [{

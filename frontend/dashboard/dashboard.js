@@ -649,10 +649,8 @@ function agregarDivObjetivo() {
 // Función para obtener y mostrar los objetivos diarios
 function getDailyGoals(selectedDate = new Date()) {
     const sessionID = localStorage.getItem('sessionID');
-    const year = selectedDate.getFullYear();
-    const month = ('0' + (selectedDate.getMonth() + 1)).slice(-2);
-    const day = ('0' + selectedDate.getDate()).slice(-2);
-    const formattedDate = `${year}-${month}-${day}`;
+    selectedDate.setHours(0, 0, 0, 0); // Normaliza la hora a medianoche
+    const formattedDate = selectedDate.toISOString().split('T')[0];
     const url = `http://127.0.0.1:5000/get_daily_goals?sessionID=${sessionID}&selectedDate=${formattedDate}`;
 
     fetch(url)
