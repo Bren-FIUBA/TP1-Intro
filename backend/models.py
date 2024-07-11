@@ -24,3 +24,13 @@ class DailyGoal(db.Model):
     goal = db.Column(db.Text, nullable=False)
     completed = db.Column(db.Boolean, nullable=False, default=False)
     date = db.Column(db.Date, nullable=False, default=datetime.date.today)
+
+class Event(db.Model):
+    __tablename__ = "events"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    title = db.Column(db.String(80), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    event_date = db.Column(db.Date, nullable=False)
+    start_time = db.Column(db.Time, nullable=True)
+    end_time = db.Column(db.Time, nullable=True)

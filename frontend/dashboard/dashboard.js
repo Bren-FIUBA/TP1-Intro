@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", function() {
     getDailyGoals(selectedDate);
     getDailyProgress(selectedDate); // Obtiene el progreso diario para la fecha actual
     getWeeklyProgress(selectedDate); // Obtiene el progreso semanal para la fecha actual
+    getEvents(selectedDate);
     getTasks();
     daily_goals_fetched = true;
 });
@@ -874,5 +875,267 @@ function renderDailyProgressChart(data) {
             responsive: true,
             maintainAspectRatio: false
         }
+    });
+}
+
+// ---------------------------------- Agenda ----------------------------------
+function agregarEvento() {
+    event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+
+    const selectedDate = localStorage.getItem('selectedDate');
+
+    const eventTitle = document.getElementById('eventTitle').value.trim();
+    const eventDescription = document.getElementById('eventDescription').value.trim();
+    const eventDate = document.getElementById('eventDate').value;
+    const eventStartTime = document.getElementById('eventStartTime').value;
+    const eventEndTime = document.getElementById('eventEndTime').value;
+
+    if (!eventTitle || !eventDate) {
+        alert('Por favor completa todos los campos obligatorios.');
+        return;
+    }
+
+    const eventData = {
+        user_id: localStorage.getItem('sessionID'),
+        title: eventTitle,
+        description: eventDescription,
+        event_date: eventDate,
+        start_time: eventStartTime,
+        end_time: eventEndTime
+    };
+
+    fetch('http://127.0.0.1:5000/add_event', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(eventData),
+        })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Evento agregado exitosamente:', data);
+        closeForm();
+        getEvents(selectedDate);
+    })
+    .catch(error => {
+        console.error('Error al agregar evento:', error);
+    });
+}
+
+function showForm() {
+    const formBackground = document.getElementById("form-bg");
+    const formDiv = document.getElementById("form-div");
+
+    formBackground.style.display = 'flex';
+    formDiv.style.display = 'block';
+    document.getElementById("eventForm").reset();
+}
+
+function closeForm() {
+    const formDiv = document.getElementById("form-div");
+    const formBackground = document.getElementById("form-bg");
+    formBackground.style.display = 'none';
+    formDiv.style.display = 'none';
+    document.getElementById("eventForm").reset();
+
+    const eventSubmitButton = document.getElementById('eventSubmitButton');
+    eventSubmitButton.value = 'Agregar Evento';
+    eventSubmitButton.onclick = agregarEvento;
+}
+
+function getEvents(selectedDate = new Date()) {
+    const sessionID = localStorage.getItem('sessionID');
+    let url = `http://127.0.0.1:5000/get_events?sessionID=${sessionID}`;
+
+    let storedDate = localStorage.getItem("selectedDate");
+
+    if (storedDate) {
+        selectedDate = new Date(storedDate);
+    } else {
+        selectedDate = new Date(); // o cualquier valor por defecto
+    }
+    
+    if (selectedDate) {
+        const formattedDate = selectedDate.toISOString().slice(0, 10);
+        url += `&selectedDate=${formattedDate}`;
+    }
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            displayEvents(data.events);
+        })
+        .catch(error => {
+            console.error('Error al obtener los eventos:', error);
+        });
+}
+
+function displayEvents(events) {
+    const eventsContainer = document.querySelector(".schedule");
+    eventsContainer.innerHTML = "";
+
+    if (events.length > 0) {
+        events.forEach(event => {
+            let eventDiv = document.createElement("div");
+            eventDiv.classList.add("event-div");
+            eventDiv.setAttribute("event-id", event.id);
+
+            let eventTitle = document.createElement("div");
+            let title = document.createElement("h6");
+            
+            let buttonsAndTimeDiv = document.createElement("div");
+            let buttonsDiv = document.createElement("div");
+
+            buttonsAndTimeDiv.setAttribute("class", "buttons-time-div");
+            buttonsDiv.setAttribute("class", "buttons-div");
+
+            let time = document.createElement("h6");
+            
+            // Botón Editar
+            let editButton = document.createElement("button");
+            editButton.textContent = "✏️";
+            editButton.classList.add("edit-button");
+            editButton.addEventListener("click", () => showEditForm(event));    
+
+            // Botón Eliminar
+            let deleteButton = document.createElement("button");
+            deleteButton.textContent = "❌";
+            deleteButton.classList.add("delete-button");
+            deleteButton.addEventListener("click", () => deleteEvent(event.id));
+
+            // Función para formatear las horas
+            function formatTime(timeStr) {
+                if (!timeStr) return null;
+                let [hours, minutes, seconds] = timeStr.split(':');
+                if (minutes === '00' && seconds === '00') {
+                    return `${hours}hs`;
+                } else {
+                    return `${hours}:${minutes}hs`;
+                }
+            }
+
+            // Comprobar si start_time y end_time no son nulos ni vacíos
+            const startTime = formatTime(event.start_time);
+            const endTime = formatTime(event.end_time);
+
+            // Mostrar hora solo si está disponible
+            if (startTime || endTime) {
+                if (startTime && endTime) {
+                    time.textContent = `${startTime} - ${endTime}`;
+                } else if (startTime) {
+                    time.textContent = `${startTime}`;
+                } else if (endTime) {
+                    time.textContent = `${endTime}`;
+                }
+            } else {
+                time.textContent = "--";
+            }
+
+            title.textContent = `• ${event.title}`;
+
+            title.classList.add("event-title");
+            time.classList.add("event-time");
+            eventTitle.classList.add("event-title-div");
+
+            let eventDesc = document.createElement("p");
+            eventDesc.textContent = event.description;
+            eventDesc.classList.add("event-desc");
+
+            eventTitle.appendChild(title);
+            buttonsDiv.appendChild(editButton);
+            buttonsDiv.appendChild(deleteButton);
+
+            buttonsAndTimeDiv.appendChild(buttonsDiv);
+            buttonsAndTimeDiv.appendChild(time); // Agregar botón Editar al título
+
+            eventTitle.appendChild(buttonsAndTimeDiv);
+
+            eventDiv.appendChild(eventTitle);
+            eventDiv.appendChild(eventDesc);
+            eventsContainer.appendChild(eventDiv);
+        });
+    } else {
+        let noEventsMessage = document.createElement("p");
+        noEventsMessage.classList.add("event-desc")
+        noEventsMessage.textContent = "No tienes ningún evento agendado para hoy.";
+        eventsContainer.appendChild(noEventsMessage);
+    }
+}
+
+function deleteEvent(eventId) {
+    fetch(`http://127.0.0.1:5000/delete_event/${eventId}`, {
+        method: 'DELETE',
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Evento eliminado exitosamente:', data);
+        
+        // Aquí necesitas remover el div del evento eliminado
+        let eventDiv = document.querySelector(`div[event-id="${eventId}"]`);
+        if (eventDiv) {
+            eventDiv.remove(); // Remueve el div del DOM
+        } else {
+            console.error('Error: No se encontró el div del evento para eliminar.');
+        }
+    })
+    .catch(error => {
+        console.error('Error al eliminar evento:', error);
+    });
+}
+
+function showEditForm(event) {
+    const formDiv = document.getElementById("form-div");
+    formDiv.style.display = 'block';
+
+    document.getElementById('eventTitle').value = event.title;
+    document.getElementById('eventDescription').value = event.description;
+    document.getElementById('eventDate').value = event.event_date;
+    document.getElementById('eventStartTime').value = event.start_time;
+    document.getElementById('eventEndTime').value = event.end_time;
+
+    const eventSubmitButton = document.getElementById('eventSubmitButton');
+    eventSubmitButton.value = 'Guardar Cambios';
+    eventSubmitButton.onclick = function() {
+        editarEvento(event.id);
+    }
+}
+
+function editarEvento(eventId) {
+    event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+
+    const eventTitle = document.getElementById('eventTitle').value.trim();
+    const eventDescription = document.getElementById('eventDescription').value.trim();
+    const eventDate = document.getElementById('eventDate').value;
+    const eventStartTime = document.getElementById('eventStartTime').value;
+    const eventEndTime = document.getElementById('eventEndTime').value;
+
+    if (!eventTitle || !eventDate) {
+        alert('Por favor completa todos los campos obligatorios.');
+        return;
+    }
+
+    const eventData = {
+        title: eventTitle,
+        description: eventDescription,
+        event_date: eventDate,
+        start_time: eventStartTime,
+        end_time: eventEndTime
+    };
+
+    fetch(`http://127.0.0.1:5000/edit_event/${eventId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(eventData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Evento actualizado exitosamente:', data);
+        closeForm();
+        getEvents();
+    })
+    .catch(error => {
+        console.error('Error al actualizar evento:', error);
     });
 }

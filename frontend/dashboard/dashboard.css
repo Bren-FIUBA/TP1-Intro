@@ -465,19 +465,30 @@ body {
             box-shadow: 0 0 15px rgba(95,2,169, 0.7);
         }
 
-    .schedule-div {
-        background-color: inherit;
-        width: 100%;
-        height: 100%;
-        flex: 3;
-    }
-
-        .schedule-title {
-            color: var(--primary-text-color);
-            font-weight: lighter;
-            margin: 10px 0;
+        .schedule-div {
+            border: 1px solid var(--main-purple);
+            display: flex;
+            flex-direction: column;
+            width: 95%;
+            height: 100%;
+            flex: 3;
+            margin: auto;
+            padding: 10px;
+            overflow-y: auto;
+            /* Personalización de la scrollbar del div */
+            scrollbar-width:thin ; /* Ancho de la scrollbar */
+            scrollbar-color: transparent transparent; /* Color de la scrollbar y del fondo */
+            transition: scrollbar-color 0.3s ease;
         }
-
+    
+        .schedule-div:hover {
+            scrollbar-color: var(--main-purple) transparent;
+        }
+    
+            .schedule-title {
+                color: var(--text-color);
+                margin: 5px;
+            }
     .sep {
         display: flex;
         width: 90%;
@@ -485,3 +496,171 @@ body {
         margin: auto;
         background-color: var(--main-purple);
     }
+
+    /* FORM */
+#form-div {
+    display: none;
+    z-index: 9999; /* Asegura que esté por encima de otros elementos */
+    left: 0;
+    top: 0;
+    width: 25%;
+    height: 75%;
+    justify-content: center;
+    margin: auto;
+    background-color: var(--board-color);
+    padding: 40px 10px;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative; /* Necesario para la posición absoluta del botón de cerrar */
+    border: 1px solid var(--main-purple);
+    overflow: auto;
+}
+
+#form-bg {
+    display: none;
+    position: fixed;
+    z-index: 9999; /* Asegura que esté por encima de otros elementos */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(14, 7, 31, 0.8); /* Fondo semi-transparente */
+    justify-content: center;
+}
+
+#close-form-button {
+    display: inline-block;
+    background-color: var(--board-color);
+    border: none;
+    font-weight: bold;
+    color: var(--main-purple);
+    cursor: pointer;
+    font-size: 20px;
+    text-align: right;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+#close-form-button:hover, #close-form-button:focus {
+    outline: none;
+    color: var(--text-color);
+}
+
+#event-form {
+    background-color: var(--main-purple);
+}
+
+.event-form-input {
+    margin: 5px 0px;
+    padding: 7px;
+    border: 1px solid var(--main-purple);
+    background-color: transparent;
+    color: var(--main-purple);
+    border-radius: 3px;
+    width: 70%;
+}
+
+.event-form-input::placeholder {
+    font-style: italic;
+    color: var(--main-purple);
+    font-weight: bold;
+}
+
+.event-form-input:focus {
+    outline: none;
+}
+
+#eventSubmitButton {
+    margin: 5px 0px;
+    padding: 7px;
+    border: 1px solid var(--main-purple);
+    background-color: transparent;
+    color: var(--main-purple);
+    border-radius: 3px;
+    width: 70%;
+    text-align: center;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#eventSubmitButton:hover {
+    background-color: rgb(95,2,169);
+    border-color: rgb(95,2,169);
+    color: rgb(184,160,247);
+    box-shadow: 0 0 15px rgba(95,2,169, 0.7);
+}
+
+#create-event-button {
+    border: 1px var(--board-color) solid;
+}
+
+#create-event-button:hover {
+    color: var(--main-purple);
+    border: 1px solid var(--main-purple);
+}
+
+.event-div {
+    display: flex;
+    flex-direction: column;
+    margin: 5px 0;
+    padding: 2px;
+    border: 1px solid var(--board-color);
+}
+.event-div:hover {
+    border: 1px solid var(--main-purple);
+    border-radius: 2px;
+}
+
+.event-title-div {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Cambiado a flex-start para alinear los elementos en la parte superior */
+    padding: 5px;
+}
+
+.event-title {
+    color: var(--main-purple);
+    font-size: 14px;
+    text-align: left;
+}
+
+.buttons-time-div {
+    display: flex;
+    flex-direction: column; /* Cambiado a columna para que los botones estén arriba y la hora debajo */
+    align-items: flex-end; /* Alinea los elementos a la derecha */
+    margin-bottom: 5px;
+    justify-content: space-between;
+}
+
+.buttons-div {
+    display: flex;
+}
+
+.event-desc {
+    color: var(--secondary-text-color);
+}
+
+.event-time {
+    font-size: 14px;
+    color: var(--secondary-text-color);
+}
+
+.edit-button, .delete-button {
+    display: none;
+    border: none;
+    background-color: var(--board-color);
+    color: var(--main-purple);
+    font-size: 10px;
+    padding: none;
+}
+
+.event-div:hover .edit-button, .event-div:hover .delete-button {
+    display: flex;
+}
+
+.event-div:hover .event-time {
+    display: none;
+}

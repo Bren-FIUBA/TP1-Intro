@@ -94,10 +94,32 @@
             <div class="sep"></div>
 
             <div class="schedule-div">
-                <h4 class="schedule-title">Agenda</h4>
-                <div class="schedule">
+                <h3 class="schedule-title">Agenda</h4>
 
+                <div id="form-bg">
+                    <div id="form-div">
+                        <button id="close-form-button" onclick="closeForm()"> x </button>
+                        <form id="eventForm" onsubmit="agregarEvento()">
+                            <input type="text" id="eventTitle" name="eventTitle" class="event-form-input" placeholder="Event Title" required><br><br>
+                                                    
+                            <textarea id="eventDescription" name="eventDescription" class="event-form-input" placeholder="Description"></textarea><br><br>
+                                                    
+                            <input type="date" id="eventDate" name="eventDate" class="event-form-input" placeholder="Date" required><br><br>
+                                                    
+                            <input type="time" id="eventStartTime" name="eventStartTime" class="event-form-input" placeholder="Hora de Inicio"><br><br>
+                                                    
+                            <input type="time" id="eventEndTime" name="eventEndTime" class="event-form-input" placeholder="Hora de Fin"><br><br>
+                                                    
+                            <input type="submit" id="eventSubmitButton" value="Agregar Evento">
+                        </form>
+                    </div>
                 </div>
+                    
+                <div class="schedule">
+                    
+                </div>
+                
+                <button id="create-event-button" class="create-task-button" onclick="showForm()" >+</button>
             </div>
         
         </div>

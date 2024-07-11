@@ -5,7 +5,7 @@ from datetime import date, datetime, timedelta, time
 from sqlalchemy import func
 
 # Importo los modelos de tablas que hice en el archivo models.py
-from models import db, User, Task, DailyGoal
+from models import db, User, Task, DailyGoal, Event
 
 # Creamos una instancia de Flask, que es nuestra aplicación web.
 app = Flask(__name__)
@@ -327,7 +327,6 @@ def get_daily_goals():
 
     return jsonify(daily_goals_list), 200
 
-
 # Endpoint para marcar un objetivo diario como completado
 @app.route("/complete_daily_goal", methods=['POST'])
 def mark_daily_goal_completed():
@@ -351,7 +350,7 @@ def mark_daily_goal_completed():
 # --------------------------------- gráficos --------------------------------- #
 @app.route('/weekly-progress', methods=['GET'])
 def get_weekly_progress():
-    session_id = request.args.get('sessionID')  # Obtener sessionID del query string
+    session_id = request.args.get('sessionID') 
     user = User.query.filter_by(id=session_id).first()
 
     selected_date = request.args.get('date')
@@ -400,6 +399,106 @@ def get_daily_progress():
         'total_goals': total_goals,
         'completed_goals': completed_goals
     })
+
+# --------------------------------- agenda --------------------------------- #
+@app.route("/add_event", methods=['POST'])
+def add_event():  
+    data = request.get_json()
+    start_time = data.get('start_time')
+    end_time = data.get('end_time')
+    
+    if not start_time or start_time=='':
+        start_time = None
+    else:
+        start_time = time.fromisoformat(start_time)
+
+    if not end_time or end_time=='':
+        end_time = None
+    else:
+        end_time = time.fromisoformat(end_time)
+        
+    nuevo_evento = Event(
+        user_id=data.get('user_id'),
+        title=data.get('title'),
+        description=data.get('description'),
+        event_date=data.get('event_date'),
+        start_time=start_time,
+        end_time=end_time
+    )
+
+    db.session.add(nuevo_evento)
+    db.session.commit()
+
+    return jsonify({'message': 'Evento agregado exitosamente.', 'event_id': nuevo_evento.id}), 200
+
+@app.route("/get_events", methods=['GET'])
+def get_events():
+    session_id = request.args.get('sessionID')
+    user = User.query.filter_by(id=session_id).first()
+
+    selected_date_str = request.args.get('selectedDate')
+    if selected_date_str:
+        selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+    else:
+        selected_date = datetime.today()
+
+    eventos = Event.query.filter_by(user_id=user.id, event_date=selected_date).all()
+    eventos_list = [{
+        'id': evento.id,
+        'title': evento.title,
+        'description': evento.description,
+        'event_date': evento.event_date.isoformat(),
+        'start_time': evento.start_time.isoformat() if evento.start_time else None,
+        'end_time': evento.end_time.isoformat() if evento.end_time else None,
+    } for evento in eventos]
+
+    return jsonify({'events': eventos_list}), 200
+
+@app.route("/edit_event/<int:event_id>", methods=['PUT'])
+def edit_event(event_id):
+    try:
+        data = request.get_json()
+
+        evento = Event.query.get(event_id)
+        if not evento:
+            return jsonify({'message': 'Evento no encontrado.'}), 404
+
+        evento.title = data.get('title', evento.title)
+        evento.description = data.get('description', evento.description)
+        evento.event_date = data.get('event_date', evento.event_date)
+        start_time = data.get('start_time')
+        end_time = data.get('end_time')
+
+        if start_time:
+            evento.start_time = time.fromisoformat(start_time)
+        else:
+            evento.start_time = None
+
+        if end_time:
+            evento.end_time = time.fromisoformat(end_time)
+        else:
+            evento.end_time = None
+
+        db.session.commit()
+
+        return jsonify({'message': 'Evento actualizado exitosamente.', 'event_id': evento.id}), 200
+
+    except Exception as e:
+        print("Error al editar evento:", e)
+        return jsonify({'message': 'Error al editar evento.', 'error': str(e)}), 500
+
+# Ruta para eliminar un evento específico por ID
+@app.route("/delete_event/<int:event_id>", methods=['DELETE'])
+def delete_event(event_id):
+    evento = Event.query.filter_by(id=event_id).first()
+
+    if not evento:
+        return jsonify({'message': 'Evento no encontrado.'}), 404
+
+    db.session.delete(evento)
+    db.session.commit()
+
+    return jsonify({'message': 'Evento eliminado exitosamente.'}), 200
 
 
 if __name__ == "__main__":
