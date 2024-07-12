@@ -25,6 +25,9 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 app.config["SECRET_KEY"] = "bren"
 
+app.config['TIMEZONE'] = 'America/Buenos_Aires'  # Ajusta a la zona horaria deseada
+timezone_app = pytz.timezone(app.config['TIMEZONE'])
+
 # Creamos instancia de SQLAlchemy y la asociamos con la aplicación Flask que acabamos de crear. Esto inicializa SQLAlchemy con la configuración de la aplicación Flask, permitiendo que la aplicación interactúe con la base de datos de una manera más sencilla. Al crear esta instancia estamos creando un objeto de python que maneja la conexión a la base de datos y nos proporciona métodos para interactuar con ella directamente sin necesidad de escribir código en SQL.
 # Permite que una instancia de SQLAlchemy creada previamente (db) se use con una aplicación Flask específica (app).
 db.init_app(app)
@@ -38,8 +41,9 @@ db.init_app(app)
 global_session_id = None
 
 def get_current_date():
-    # Asumiendo que el servidor está en UTC
-    return datetime.now(utc).date()
+    # Obtener la fecha y hora actual en la zona horaria configurada
+    now = datetime.now(timezone_app)
+    return now.date()
 
 @app.route("/register", methods=['POST'])
 def register():
@@ -273,6 +277,10 @@ def create_daily_goal_records():
 
     # Crear registros diarios para cada día desde la última fecha de objetivos hasta hoy
     current_date = last_date + timedelta(days=1)  # Empezamos desde el día siguiente al último registrado
+
+    print(f'Actual current datetime: {datetime.now(timezone_app)}')
+    print(f'Actual current date: {get_current_date()}')
+
     while current_date <= get_current_date():
         existing_goals = DailyGoal.query.filter_by(user_id=user.id, date=current_date).all()
 
