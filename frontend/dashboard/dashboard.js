@@ -25,18 +25,6 @@ function logout() {
     window.location.href = 'http://localhost:8000/login/';
 }
 
-// para que también se borre localstorage si cierra la ventana.
-// Comprueba si la página se está recargando o cerrando
-window.addEventListener('unload', function(event) {
-    if (sessionStorage.getItem('reloading') === 'true') {
-        // Si es una recarga, elimina la bandera
-        sessionStorage.removeItem('reloading');
-    } else {
-        // Si no es una recarga, elimina los datos de localStorage
-        localStorage.clear();
-    }
-});
-
 // ---------------------------------- Handle Views ----------------------------------
 // Función para mostrar el main-div y ocultar daily-goals-config-div
 function showMainDiv() {
