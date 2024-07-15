@@ -71,7 +71,7 @@ header, .todo-div, .daily-goal-div, .daily-goals-card, .todo-div, #weekly-goals-
     .navbar-div button {
         border: none;
         font-size: 20px;
-        height: 50px;
+        padding: 30px 0;
         transition: color 0.5s ease, background-color 0.5s ease;
     }
 
@@ -149,6 +149,7 @@ header, .todo-div, .daily-goal-div, .daily-goals-card, .todo-div, #weekly-goals-
             box-shadow: 0 3px 10px rgba(15, 13, 31, 0.9);
             padding: 10px;
             box-sizing: border-box;
+            min-width: 250px;
         }
 
             .todo-and-stats-div {
@@ -156,6 +157,7 @@ header, .todo-div, .daily-goal-div, .daily-goals-card, .todo-div, #weekly-goals-
                 flex-direction: column;
                 gap: 15px;
                 flex: 6;
+                min-width: 450px;
             }
 
                 .todo-div {
@@ -281,6 +283,8 @@ header, .todo-div, .daily-goal-div, .daily-goals-card, .todo-div, #weekly-goals-
                         flex: 3;
                         padding: 10px;
                         box-shadow: 0 3px 10px rgba(15, 13, 31, 0.9);
+                        justify-content: center;
+                        align-items: center;
                     }
 
                     #daily-progress-div {
@@ -536,3 +540,105 @@ header, .todo-div, .daily-goal-div, .daily-goals-card, .todo-div, #weekly-goals-
 
 #daily-goals-config-card, .main-di, .board-div, .daily-goals-div, .todo-and-stats-div, .todo-div, .stats-div, #weekly-progress-chart, #daily-progress-chart, .side-div, .calendar-div, .schedule-div, #form-bg
 { height: 100%; }
+
+@media screen and (max-width: 1200px) {
+    .side-div {
+        display: none;
+    }
+    .board-div {
+        overflow: auto;
+        display: block;
+        scrollbar-width: thin; /* Ancho de la scrollbar */
+        scrollbar-color: transparent transparent; /* Color de la scrollbar y del fondo */
+    }
+    .main-div {
+        overflow: auto;
+    }
+    .daily-goals-div {
+        height: 300px;
+        margin-bottom: 10px;
+    }
+    .stats-div {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        height: 800px;
+    }
+    #daily-progress-div,  #weekly-goals-stats-div {
+        height: 250px;
+        padding: 10px;
+    }
+}
+
+@media screen and (max-width: 950px) {
+    .container {
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+        display: block;
+        scrollbar-width: thin; /* Ancho de la scrollbar */
+        scrollbar-color: transparent transparent; /* Color de la scrollbar y del fondo */
+    }
+    .navbar-div {
+        margin-bottom: 20px;
+        height: 20px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+    }
+    .navbar-div button {
+        padding: 10px 0;
+    }
+    .stats-div {
+        min-height: 150px;
+        display: block;
+        justify-content: center;
+        align-items: center;
+    }
+    #daily-progress-div {
+        padding: 50px 100px;
+    }
+    #weekly-goals-stats-div {
+        margin-bottom: 10px;
+        height: 200px;
+        padding: 10px;
+    }
+}
+
+@media screen and (max-width: 780px) {
+    .daily-goals-div, .daily-goals-card, .todo-and-stats-div, .stats-div {
+        width: 100%;
+        min-width: 300px;
+        margin: 15px 0;
+    }
+    .navbar-div {
+        height: 30px;
+        justify-content: center;
+        align-items: center;
+    }
+    .container, .main-div, .board-div, .todo-and-stats-div {
+        display: block;
+    }
+    .stats-div {
+        display: block;
+        margin-bottom: 10px;
+    }
+    .container, .todo-and-stats-div, .stats-div {
+        overflow: auto;
+    }
+    #weekly-goals-stats-div {
+        height: 250px;
+    }
+    #daily-progress-div {
+        padding: 30px;
+        height: 300px;
+    }
+}
+
+@media screen and (max-width: 650px) {
+    #logo {
+        display: none;
+    }
+}
