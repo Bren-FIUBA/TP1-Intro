@@ -1,12 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     fetchUserInfo(); // Llama a una función para obtener datos del usuario al cargar la página
-    updateDate();
     updateClock();
 });
-
-window.onload = function() {
-    updateDate(); // Actualizar la fecha al cargar la página
-};
 
 // Siempre actualizar la fecha seleccionada a la fecha actual al cargar la página
 localStorage.setItem('selectedDate', new Date().toISOString().split('T')[0]);
@@ -15,8 +10,7 @@ function setSelectedDate(date) {
     localStorage.setItem('selectedDate', date.toISOString().split('T')[0]);
 }
 
-// saludo
-function fetchUserInfo() {
+function fetchUserInfo() { // saludo
     const sessionID = localStorage.getItem('sessionID');
     fetch(`http://127.0.0.1:5000/user_info?sessionID=${sessionID}`)
         .then(response => response.json())
@@ -73,7 +67,10 @@ function updateClock() {
 
     // Convierte a formato de 12 horas
     hours = hours % 12;
-    if (hours === 0) { hours = 12 } // La hora '0' debería ser '12' en formato 12 horas
+    if (hours === 0) { 
+        hours = 12;
+        updateDate(); // A las 12 actualizamos la fecha del header
+    } // La hora '0' debería ser '12' en formato 12 horas
 
     // Formatea los minutos para asegurar dos dígitos
     var minutesFormatted;
@@ -101,11 +98,6 @@ function updateDate() {
 setInterval(function() {
     updateClock();
 }, 1000);
-
-// Actualizar la fecha cada hora. Para una mejor experiencia, de todas maneras se actualizará cuando el usuario recargue la página.
-setInterval(function() {
-    updateDate();
-}, 3600000);
 
 // CALENDARIO
 // Función para generar el calendario de un mes específico
@@ -159,18 +151,15 @@ function generateCalendar(year, month) {
                 element.classList.remove('today');
             });
 
-            // Añadir la clase 'today' solo al día seleccionado
-            dayElement.classList.add('today');
+            dayElement.classList.add('today'); // Añadir la clase 'today' solo al día seleccionado
         });
 
-        // Resaltar el día actual dinámicamente
         if (day === todayDate.getDate() && month === todayDate.getMonth() && year === todayDate.getFullYear()) {
-            dayElement.classList.add('today');
+            dayElement.classList.add('today'); // Resaltar el día actual dinámicamente
         }
         calendarGrid.appendChild(dayElement);
     }
 }
-
 
 function changeHeaderDate(date) {
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -186,13 +175,12 @@ function updateHeader(date) {
     }
 }
 
-// Obtener la fecha actual
+// Obtener la fecha actual para mostrar esos datos al cargar la página
 const currentDate = new Date();
 let currentYear = currentDate.getFullYear();
 let currentMonth = currentDate.getMonth();
 
-// Generar calendario inicial
-generateCalendar(currentYear, currentMonth);
+generateCalendar(currentYear, currentMonth); // Generar calendario inicial
 
 // Manejar la navegación entre meses
 document.getElementById('prev-month').addEventListener('click', () => {

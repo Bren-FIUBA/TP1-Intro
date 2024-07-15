@@ -12,9 +12,10 @@
 <body>
     <div class="container">
         <nav class="navbar-div">
-            <button class="navbar-button" id="home-button" onclick="showMainDiv()">🏠︎</button>
-            <button class="navbar-button" id="daily-goals-button" onclick="showDailyGoalsConfig()">⚙</button>
-            <button class="navbar-button" id="daily-goals-button" onclick="logout()">ⓘ</button>
+            <div id="logo">MindSpace</div>
+            <button class="navbar-button" id="home-button" onclick="showMainDiv()">Home</button>
+            <button class="navbar-button" id="daily-goals-button" onclick="showDailyGoalsConfig()">Goals</button>
+            <button class="navbar-button" id="daily-goals-button" onclick="logout()">Logout</button>
         </nav>
 
         <div class="main-div" id="main-div">
@@ -23,14 +24,10 @@
                 <h4 class="date-info-header" id="current-date">...</h4>
             </header>
 
-            <div class="board-text-div">
-                <h3 id="daily-goals-header" class="board-text">Objetivos de hoy</h3>
-                <h3 id="daily-tasks-header" class="board-text">Tareas de hoy</h3>
-            </div>
-
             <div class="board-div">
     
                 <div class="daily-goals-div">
+                    <h3 id="daily-goals-header" class="board-text">Objetivos de hoy</h3>
                     <div class="daily-goals-container">
                         <!--objetivos del usuario-->
                     </div>
@@ -39,6 +36,7 @@
                 <div class="todo-and-stats-div">
                     
                     <div class="todo-div">
+                        <h3 id="daily-tasks-header" class="board-text">Tareas de hoy</h3>
                         <div class="tasks-container">
                             <!--tareas que se irán agregando-->
                         </div>
@@ -119,7 +117,7 @@
                     
                 </div>
                 
-                <button id="create-event-button" class="create-task-button" onclick="showForm()" >+</button>
+                <button id="create-event-button" onclick="showForm()" >+</button>
             </div>
         
         </div>

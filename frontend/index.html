@@ -8,7 +8,6 @@
 </head>
 
 <body>
-
     <div class="container">
 
         <div class="img-div">
@@ -30,9 +29,9 @@
                 <p>¿No tienes una cuenta? <a href="/register/">Regístrate.</a></p>
             </form>
         </div>
+
     </div>
     <script>
-        // Asignándole un evento al form cuando la información de éste se "submittea", cosa que ocurre cuando se presiona el input de tipo submit dentro del form.
         document.getElementById("login-form").addEventListener("submit", function(event) {
             event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
 
@@ -46,13 +45,8 @@
             if (!email || !password) {
                 errorMessage.textContent = "Por favor, completa todos los campos!";
                 errorMessage.style.opacity = 1;
-
-                // limpiamos los campos para un nuevo intento
-                document.getElementById("password").value = "";
-                document.getElementById("email").value = "";
             } else {
-                // Si el usuario completa todos los campos, comenzamos con el fetch. Enviamos mail y contraseña al servidor back para que consulte a la base de datos y se fije si existe una cuenta registrada con ese mail, y, de ser así, que se fije si la contraseña que recibió del usuario le corresponde a la que está asociada a ese mail en la base de datos.
-
+                // Si el usuario completa todos los campos, comenzamos con el fetch.
                 // Si pasa las validaciones, crea un objeto con los datos del formulario
                 const formData = {
                     email: email,

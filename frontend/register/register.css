@@ -1,3 +1,12 @@
+/* Declarando variables de colores */
+:root {
+    --main-purple: rgb(117, 31, 255);
+    --dark-color: rgb(15, 13, 31);
+    --border-color: rgba(184,160,247, 0.2);
+    --primary-text-color: rgb(255, 255, 255);
+    --text-color: rgb(237, 215, 252);
+}
+
 * {
     font-family: sans-serif;
     box-sizing: border-box;
@@ -15,7 +24,7 @@ body {
 .container {
     display: flex;
     position: relative;
-    background-color: rgb(14,11,19);
+    background-color: var(--dark-color);
     margin: auto;
     min-height: 90vh;
     min-width: 200px;
@@ -63,12 +72,12 @@ form {
 
 h1 {
     margin: 10px 0;
-    color: rgb(95,2,169);
+    color: var(--main-purple);
     font-size: 50px;
 }
 
 h3 {
-    color: rgb(95,2,169);
+    color: var(--main-purple);
     font-size: 20px;
     font-weight: lighter;
     margin-bottom: 20px
@@ -83,86 +92,32 @@ h3 {
 .register-input {
     margin: 5px 0px;
     padding: 4px 8px;
-    border: 2px rgba(184,160,247, 0.15) solid;
-    background-color: rgb(14,11,19);
-    color: rgb(95,2,169);
+    border: 2px var(--border-color) solid;
+    background-color: transparent;
+    color: var(--main-purple);
     border-radius: 3px;
     width: 60%;
 }
 
 .register-input:focus {
     outline: none;
-    border-color: rgb(95,2,169);
-    box-shadow: 0 0 15px rgba(95,2,169, 0.7);
+    border-color: var(--main-purple);
+    box-shadow: 0 0 15px rgba(117, 31, 255, 0.9);
 }
 
 .register-input::placeholder {
     font-style: italic;
-    color: rgba(184,160,247, 0.15);
+    color: var(--border-color);
     font-weight: bold;
-}
-
-.pronoun-section-container {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    color: rgba(184,160,247, 0.15);
-    font-weight: bold;
-    font-style: italic;
-}
-
-.pronoun-section-container p {
-    margin: 0;
-    color: rgb(95,2,169);
-    padding: 5px 0;
-}
-
-.pronoun-section-container label {
-    margin: 5px 0;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-}
-
-.pronoun-section-container input[type="radio"] {
-    display: none;
-}
-
-.custom-radio {
-    width: 16px;
-    height: 16px;
-    border: none;
-    border-radius: 50%;
-    background-color: rgba(184,160,247, 0.15);
-    margin-right: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
-
-.custom-radio::after {
-    content: "";
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: transparent;
-    transition: background-color 0.3s;
-}
-
-.pronoun-section-container input[type="radio"]:checked + .custom-radio::after {
-    background-color: rgb(95,2,169);
-    box-shadow: 0 0 15px rgba(95,2,169, 0.7);
-    border: none;
 }
 
 #register-button {
     margin: 5px 0px;
     text-align: center;
     padding: 4px;
-    border: 2px rgba(184,160,247, 0.15) solid;
-    background-color: rgb(14,11,19);
-    color: rgba(184,160,247, 0.15);
+    border: 2px var(--border-color) solid;
+    background-color: transparent;
+    color: var(--border-color);
     cursor: pointer;
     font-weight: bold;
     font-size: 15px;
@@ -172,25 +127,25 @@ h3 {
 }
 
 #register-button:hover {
-    background-color: rgb(95,2,169);
-    border-color: rgb(95,2,169);
-    color: rgb(184,160,247);
-    box-shadow: 0 0 15px rgba(95,2,169, 0.7);
+    background-color: var(--main-purple);
+    border-color: var(--main-purple);
+    color: var(--text-color);
+    box-shadow: 0 0 15px rgba(117, 31, 255, 0.9);
 }
 
 p {
-    color: rgb(50, 2, 118);
+    color: rgb(63, 2, 175);
 }
 
 p a{
-    color: rgb(95,2,169);
+    color: var(--main-purple);
     text-decoration: none;
     font-weight: bold;
 }
 
 .vertical-line {
     width: 1px;
-    background-color: rgba(184,160,247, 0.15);
+    background-color: var(--border-color);
     height: 70%; /* 70% del alto del contenedor */
     align-self: center; /* Centra verticalmente la línea */
     position: absolute;
@@ -204,12 +159,12 @@ p a{
     }
 
     .img-div {
-        display: none; /* Oculta la imagen cuando la pantalla es estrecha */
+        display: none;
     }
     .register-container {
         display: flex;
-        width: 100%; /* Ancho completo para el formulario */
-        float: none; /* Cancela cualquier flotante */
+        width: 100%;
+        float: none; 
         flex-direction: column;
         justify-content: center;
         align-items: center;

@@ -1,3 +1,12 @@
+/* Declarando variables de colores */
+:root {
+    --main-purple: rgb(117, 31, 255);
+    --dark-color: rgb(15, 13, 31);
+    --border-color: rgba(184,160,247, 0.2);
+    --primary-text-color: rgb(255, 255, 255);
+    --text-color: rgb(237, 215, 252);
+}
+
 * {
     font-family: sans-serif;
     box-sizing: border-box;
@@ -16,7 +25,7 @@ body {
 .container {
     display: flex;
     position: relative;
-    background-color: rgb(14,11,19);
+    background-color: var(--dark-color);
     margin: auto;
     min-height: 90vh;
     min-width: 200px;
@@ -65,12 +74,12 @@ form {
 
 h1 {
     margin: 10px 0;
-    color: rgb(95,2,169);
+    color: var(--main-purple);
     font-size: 50px;
 }
 
 h3 {
-    color: rgb(95,2,169);
+    color: var(--main-purple);
     font-size: 20px;
     font-weight: lighter;
     margin-bottom: 20px
@@ -86,22 +95,22 @@ h3 {
 .login-input {
     margin: 5px 0px;
     padding: 4px 8px;
-    border: 2px rgba(184,160,247, 0.15) solid;
+    border: 2px var(--border-color) solid;
     background-color: inherit;
-    color: rgb(95,2,169);
+    color: var(--main-purple);
     border-radius: 3px;
     width: 60%;
 }
 
 .login-input:focus {
     outline: none;
-    border-color: rgb(95,2,169);
-    box-shadow: 0 0 15px rgba(95,2,169, 0.7);
+    border-color: var(--main-purple);
+    box-shadow: 0 0 15px rgba(117, 31, 255, 0.9);
 }
 
 .login-input::placeholder {
     font-style: italic;
-    color: rgba(184,160,247, 0.15);
+    color: var(--border-color);
     font-weight: bold;
 }
 
@@ -109,9 +118,9 @@ h3 {
     margin: 5px 0px;
     text-align: center;
     padding: 4px;
-    border: 2px rgba(184,160,247, 0.15) solid;
+    border: 2px var(--border-color) solid;
     background-color: inherit;
-    color: rgba(184,160,247, 0.15);
+    color: var(--border-color);
     cursor: pointer;
     font-weight: bold;
     font-size: 15px;
@@ -121,25 +130,25 @@ h3 {
 }
 
 .login-button:hover {
-    background-color: rgb(95,2,169);
+    background-color: var(--main-purple);
     border-color: transparent;
-    color: rgb(179, 176, 182);
-    box-shadow: 0 0 15px rgba(95,2,169, 0.7);
+    color: var(--text-color);
+    box-shadow: 0 0 15px rgba(117, 31, 255, 0.7);
 }
 
 p {
-    color: rgb(50, 2, 118);
+    color: rgb(63, 2, 175);
 }
 
 p a{
-    color: rgb(95,2,169);
+    color: var(--main-purple);
     text-decoration: none;
     font-weight: bold;
 }
 
 .vertical-line {
     width: 1px;
-    background-color: rgba(184,160,247, 0.15);
+    background-color: var(--border-color);
     height: 70%; /* 70% del alto del contenedor */
     align-self: center; /* Centra verticalmente la línea */
     position: absolute;

@@ -61,8 +61,6 @@
                 password: password,
                 confirm_password: confirmPassword,
             };
-
-            // Envía los datos al servidor backend usando fetch
             fetch('http://localhost:5000/register', { // Envía al back (puerto 5000), endpoint /register
                 method: 'POST',
                 headers: {
@@ -75,10 +73,8 @@
                     window.location.href = '/login/'; // Redirige a la página de inicio de sesión si el registro es exitoso
                 } else {
                     return response.json().then(data => { throw new Error(data.error) });
-                    // El segundo .then toma el json que devuelve app.py cuando ocurre el error de que ya existe un usuario registrado con ese email, y devuelve literalmente el texto o mensaje asociado a ese error.
                 }
             })
-            // Captura y maneja cualquier error que haya sido lanzado en el bloque anterior (el único error posible que puede capturar, es que ya existe un usuario o 'failed to fetch', ya que de los otros errores se encarga el frontend)
             .catch(error => { // Ante el error que arrojó el segundo .then, mostramos el mensaje de error en pantalla
                 errorMessage.textContent = error.message;
                 errorMessage.style.opacity = 1;

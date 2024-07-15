@@ -1,87 +1,96 @@
 /* Declarando variables de colores */
 :root {
-    --main-purple: rgb(35, 7, 73);
-    --board-color: rgb(14, 11, 19);
-    --section-color: rgb(17, 16, 22);
-    --primary-text-color: rgb(225, 225, 225);
-    --secondary-text-color: rgb(130,130,130);
-    --text-color: rgb(179, 176, 182);
+    --main-purple: rgb(94, 25, 255);
+    --dark-board-color: rgb(21, 16, 46); 
+    --board-color: rgb(15, 13, 31);
+    --card-color: rgb(30, 24, 61);
+    --primary-text-color: rgb(255, 255, 255);
+    --secondary-text-color: rgb(138, 137, 137);
+    --text-color: rgb(237, 215, 252);
 }
 
 * {
     font-family: sans-serif;
     margin: 0;
     box-sizing: border-box;
+    cursor: default;
+    color: var(--text-color)
 }
 
 body {
-    background: radial-gradient(circle, rgb(67, 53, 100) 0%, rgb(179, 176, 182) 70%);
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    overflow: hidden;
 }
+
+header, .todo-div, .daily-goal-div, .daily-goals-card, .todo-div, #weekly-goals-stats-div, #daily-progress-div, .sep, #daily-goals-config-card, .daily-goals-div
+{ background-color: var(--card-color); }
+
+.navbar-div, .daily-goals-card, .confirm-task-button:hover, .confirm-edit-button:hover, .remove-task-button:hover, .edit-task-button:hover, .confirm-goal-button:hover, .remove-goal-button:hover, .edit-goal-button:hover, .side-div, .delete-button:hover, .navbar-div button
+{ background-color: var(--board-color); }
+
+.container, #create-task-button:hover, #create-goal-button:hover, .task-div:hover, .daily-goal-div:hover, .goal-div:hover, #form-div, #close-form-button, #create-event-button:hover, .event-div:hover, .delete-button
+{ background-color: var(--dark-board-color); }
+
+.navbar-div-button, .main-div, .board-div, .todo-and-stats-div, #create-task-button, .task-chekbox, .confirm-task-button, .confirm-edit-button, .remove-task-button, .edit-task-button, .task-input, .confirm-goal-button, .remove-goal-button, .edit-goal-button, .goal-input, .calendar-div, #create-event-button, .event-form-input, #eventSubmitButton
+{ background-color: transparent; }
+
+.navbar-div button:hover, .navbar-div #logo:hover, .greeting-message, .calendar-day.today:hover, .event-div:hover .event-title, #close-form-button:hover
+{ color: var(--primary-text-color) }
+
+.event-time, .event-desc, #eventSubmitButton, .event-form-input, .event-form-input::placeholder, .calendar-weekday, .task-checkbox:checked + .task-text, .confirm-task-button, .confirm-edit-button, .remove-task-button, .edit-task-button, .task-input, .confirm-goal-button, .remove-goal-button, .edit-goal-button,  .goal-input , #create-task-button, .date-info-header, .navbar-div button
+{ color: var(--secondary-text-color); }
+
+.event-title, #create-event-button:hover, #close-form-button, .calendar-day:hover, .calendar-header button:hover, #create-task-button:hover, #create-goal-button:hover, #clock
+{ color: var(--main-purple); }
+
+.task-input:focus, .goal-input:focus, #close-form-button:hover, #close-form-button:focus, .event-form-input:focus
+{ outline: none; }
 
 .container {
     margin: auto;
-    background-color: var(--board-color);
-    width: 95%;
-    height: 93vh;
-    border-radius: 10px;
+    height: 100vh;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 15px 20px rgb(78, 78, 78);
 }
 
-
 /* Navbar */
-
 .navbar-div {
     display: flex;
     flex-direction: column;
-    background-color: inherit;
-    border-top-left-radius: inherit;
-    border-bottom-left-radius: inherit;
-    border-right: 2px var(--section-color) solid;
-    flex: 1;
-    width: 100%;
+    flex: 2;
     height: 100%;
-    align-items: center;
 }
+    #logo {
+        padding: 30px 0;
+        text-align: center;
+        font-size: 25px;
+        font-weight: bold;
+        transition: color 0.5s ease, background-color 0.5s ease;
+    }
 
     .navbar-div button {
         border: none;
-        border-radius: 5px;
-        background-color: transparent;
-        color: var(--secondary-text-color);
-        font-weight: bold;
-        font-size: 30px;
-        width: 50%;
-        height: 30px;
-        margin: 20px;
-        transition: color 0.5s ease;
+        font-size: 20px;
+        height: 50px;
+        transition: color 0.5s ease, background-color 0.5s ease;
     }
 
-    .navbar-div button:hover {
-        color: var(--primary-text-color);
-        text-shadow: 0 0 5px rgba(35, 7, 73, 1);
+    .navbar-div button:hover, .navbar-div #logo:hover {
+        background-color: var(--main-purple);
+        text-shadow: 0 0 5px rgba(237, 215, 252, 0.8);
         cursor: pointer;
     }
 
 /* Center */
-
 #daily-goals-config-div {
     display: none;
     visibility: hidden;
     height: 0;
     overflow: hidden;
-    justify-content: center;
 }
 
 #daily-goals-config-card {
     padding: 10px;
-    justify-content: center;
-    align-items: center;
 }
 
 #create-goal-button {
@@ -92,28 +101,20 @@ body {
 }
 
 .main-div {
-    width: 100%;
-    height: 100%;
-    background-color: inherit;
-    flex: 11;
+    flex: 10;
     display: flex;
     flex-direction: column;
-    padding: 10px;
+    padding: 15px 20px;
     overflow: hidden;
 }
 
     header {
-        background-color: var(--section-color);
-        justify-content: center;
-        align-items: center;
         margin: 10px 0;
-        border-radius: 5px;
         padding: 10px 10px;
-        box-shadow: 0 3px 10px rgba(7,7,7, 0.8);
+        box-shadow: 0 3px 10px rgba(15, 13, 31, 0.7);
     }
 
         .greeting-message {
-            color: var(--primary-text-color);
             font-weight: lighter;
         }
 
@@ -122,108 +123,59 @@ body {
         }
 
         .date-info-header {
-            color: var(--secondary-text-color);
             font-weight: lighter;
             font-style: italic;
         }
 
-    .board-text-div {
-        display: flex;
-        background-color: inherit;
-        margin-bottom: 5px;
-        margin-top: 20px;
-    }
         .board-text {
-            font-size: 18px;
-            font-weight: lighter;
-            color: var(--primary-text-color);
-            padding-left: 15px;
-        }
-
-        #daily-goals-header {
-            flex: 3;
-        }
-
-        #daily-tasks-header {
-            flex: 6;
+            font-size: 20px;
+            margin-bottom: 5px;
+            padding: 5px;
         }
 
     .board-div {
         display: flex;
-        background-color: inherit;
-        width: 100%;
-        height: 100%;
-        margin: none;
+        margin-top: 20px;
         padding: none;
-        gap: 10px;
+        gap: 15px;
         overflow: hidden;
+        transition: color 0.5s ease, background-color 0.5s ease;
     }
             
         .daily-goals-div {
-            background-color: var(--section-color);
-            width: 100%;
-            height: 100%;
             display: flex;
             flex-direction: column;
-            align-items: center;
             flex: 3;
-            border-radius: 5px;
-            box-shadow: 0 3px 10px rgba(7,7,7, 0.8);
+            box-shadow: 0 3px 10px rgba(15, 13, 31, 0.9);
             padding: 10px;
             box-sizing: border-box;
         }
 
-            .daily-goals-card {
-                background-color: var(--section-color);
-                width: 100%;
-                height: 100%;
-                border-radius: 5px;
-                box-shadow: 0 3px 10px rgba(7,7,7, 0.8);
-                }
-
             .todo-and-stats-div {
                 display: flex;
                 flex-direction: column;
-                background-color: inherit;
-                width: 100%;
-                height: 100%;
-                gap: 10px;
+                gap: 15px;
                 flex: 6;
             }
 
                 .todo-div {
-                    background-color: var(--section-color);
-                    width: 100%;
-                    height: 100%;
                     max-height: 260px;
-                    border-radius: 5px;
                     flex: 2;
-                    box-shadow: 0 3px 10px rgba(7,7,7, 0.8);
+                    box-shadow: 0 3px 10px rgba(15, 13, 31, 0.9);
                     display: flex;
                     flex-direction: column;
-                    align-items: center;
                     padding: 10px;
                     box-sizing: border-box;
                 }
 
                     /* Todo el contenido del todo-div */
-
-                    /* Botón de agregar tarea */
                     #create-task-button {
                         width: 95%;
                         border: none;
-                        background-color: inherit;
-                        color: rgb(78, 78, 78);
                         font-size: 20px;
-                        border-radius: 5px;
                         padding: 0;
                         margin: 5px;
                         transition: color 0.5s ease, background-color 0.5s ease;
-                    }
-
-                    #create-task-button:hover, #create-goal-button:hover {
-                        background-color: var(--board-color);
-                        color: var(--main-purple);
                     }
 
                     /* Contenedor de cada tarea que se agregue */
@@ -231,7 +183,6 @@ body {
                         display: flex;
                         flex-direction: column;
                         margin: 0;
-                        width: 100%;
                         justify-content: space-between;
                         overflow-y: auto;
                         /* Personalización de la scrollbar del div */
@@ -245,24 +196,17 @@ body {
                     }
 
                     /* Div que se crea por cada tarea agregada */
-
                     .task-div, .daily-goal-div, .goal-div {
                         display: flex;
                         gap: 4px;
                         margin: 1px;
+                        padding: 0 5px;
                         align-items: flex-start;
                         justify-content: space-between;
-                        border-radius: 5px;
                         transition: background-color 0.3s ease;
                     }
 
-                    .task-div:hover, .daily-goal-div:hover, .goal-div:hover {
-                        background-color: var(--board-color);
-                    }
-
-
                     /* Todo el contenido de cada task-div */
-
                     .task-checkbox {
                         appearance: none;
                         -webkit-appearance: none;
@@ -271,36 +215,33 @@ body {
                         min-height: 20px; /* Ajusta el tamaño del checkbox */
                         border: 2px var(--main-purple) solid; /* Color del borde */
                         border-radius: 50%; /* Hace que el checkbox sea redondo */
-                        background-color: inherit; /* Color de fondo al estar desmarcado */
                         display: flex;
-                        align-items: center;
-                        justify-content: center;
                         margin: 10px 5px;
+                        box-shadow: 0 0 5px rgba(117, 31, 255, 0.7);
                     }
                     
                     .task-checkbox:checked {
-                        background-color: var(--main-purple); /* Color de fondo al estar marcado */
                         border: none; /* Mantiene el borde del mismo color que el fondo */
-                        color: var(--primary-text-color); /* Color del tilde */
                         background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M20.2929 6.29289C20.6834 6.68342 20.6834 7.31658 20.2929 7.70711L10.7071 17.2929C10.3166 17.6834 9.68342 17.6834 9.29289 17.2929L3.70711 11.7071C3.31658 11.3166 3.31658 10.6834 3.70711 10.2929C4.09763 9.90237 4.7308 9.90237 5.12132 10.2929L10 15.1716L18.8787 6.29289C19.2692 5.90237 19.9024 5.90237 20.2929 6.29289Z" fill="white"%3E%3C/path%3E%3C/svg%3E');
                         background-size: 70%; /* Ajusta el tamaño del tilde */
                         background-repeat: no-repeat;
                         background-position: center;
+                        background-color: var(--main-purple);
                     }
                     
                     .task-text, .daily-goal-text, .goal-text {
                         flex: 1;
-                        color: var(--text-color);
                         justify-content: flex-start;
                         font-size: 14px;
-                        word-break: break-all;
                         margin: 10px 0;
                         padding: 0 10px;
+                        word-break: break-word; /* Romper palabras largas */
+                        overflow-wrap: break-word; /* Asegura el ajuste del texto */
+                        white-space: normal; /* Permitir saltos de línea automáticos */
                     }
 
                     /* Modificando el texto al completar la tarea (marcar el checkbox) */
                     .task-checkbox:checked + .task-text {
-                        color: var(--secondary-text-color);
                         font-style: italic;
                         text-decoration: line-through;
                     }
@@ -308,20 +249,13 @@ body {
                     /* Botones (contenido) de cada task-div */
                     .confirm-task-button, .confirm-edit-button, .remove-task-button, .edit-task-button, .task-input, .confirm-goal-button, .remove-goal-button, .edit-goal-button, .goal-input {
                         border: none;
-                        background-color: inherit;
-                        color: var(--secondary-text-color);
-                        border-radius: 5px;
                         padding: 5px;
-                        margin: 5px 5px;
+                        margin: 5px 0;
                     }
 
                     /* Para que no se centre todo el contenido si la tarea es muy corta */
                     .task-input, .goal-input {
                         width: 90%;
-                    }
-
-                    .task-input:focus, .goal-input:focus {
-                        outline: none;
                     }
 
                     /* Los botones no serán visibles a menos que el usuario pase el cursor sobre la tarea */
@@ -330,120 +264,90 @@ body {
                     }
 
                     /* Mostrar los botones al hacer hover en el div de la tarea */
-                    .task-div:hover .confirm-task-button,
-                    .task-div:hover .confirm-edit-button,
-                    .task-div:hover .remove-task-button,
-                    .task-div:hover .edit-task-button, 
-                    .goal-div:hover .confirm-goal-button, 
-                    .goal-div:hover .remove-goal-button, 
-                    .goal-div:hover .edit-goal-button {
+                    .task-div:hover .confirm-task-button, .task-div:hover .confirm-edit-button, .task-div:hover .remove-task-button, .task-div:hover .edit-task-button, .goal-div:hover .confirm-goal-button, .goal-div:hover .remove-goal-button, .goal-div:hover .edit-goal-button {
                         opacity: 1; /* Mostrar botones */
-                    }
-
-                    .confirm-task-button:hover, .confirm-edit-button:hover, .remove-task-button:hover, .edit-task-button:hover, .confirm-goal-button:hover, .remove-goal-button:hover, .edit-goal-button:hover {
-                        background-color: var(--main-purple);
                     }
                         
                     .stats-div {
                         flex: 1;
                         display: flex;
-                        width: 100%;
-                        height: 100%; /* Ajusta la altura según tus necesidades */
                         overflow: hidden;
                         justify-content: space-between;
-                        gap: 10px;
+                        gap: 15px;
                     }
 
                     #weekly-goals-stats-div {
                         display: flex;
-                        border: 1px solid var(--main-purple);
-                        border-radius: 5px;
                         flex: 3;
                         padding: 10px;
-                        justify-content: center;
+                        box-shadow: 0 3px 10px rgba(15, 13, 31, 0.9);
                     }
 
                     #daily-progress-div {
                         display: flex;
-                        border: 1px solid var(--main-purple);
-                        border-radius: 5px;
                         flex: 1;
                         padding: 10px;
+                        box-shadow: 0 3px 10px rgba(15, 13, 31, 0.9);
                     }
 
                     #weekly-progress-chart, #daily-progress-chart {
                         width: 90%;
-                        height: 90%;
                     }
 
 /* Side */
 .side-div {
-    width: 100%;
     height: 100%;
-    background-color: inherit;
-    border-top-right-radius: inherit;
-    border-bottom-right-radius: inherit;
     flex: 3;
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    padding: 10px;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 5px;
     border-left: 2px var(--section-color) solid;
 }
     
     .clock-div {
         display: flex;
-        width: 100%;
-        height: 100%;
         flex: 1;
     }
 
         .false-clock {
-            background-color: var(--main-purple);
-            color: var(--primary-text-color);
-            width: 90%;
             margin: auto;
-            padding: 5px 10px;
-            justify-content: center;
-            text-align: center;
+            padding: 10px;
             font-weight: bold;
-            font-size: 40px;
-            border-radius: 5px;
-            box-shadow: 0 3px 10px rgba(7,7,7, 0.8);
+            font-size: 50px;
+            text-align: center;
         }
 
     .calendar-div {
-        background-color: inherit;
         font-size: 12px;
-        width: 100%;
-        height: 100%;
         flex: 2;
+        transition: color 0.5s ease;
     }
     
         .calendar-header {
-            color: var(--text-color);
             display: flex;
             justify-content: space-around;
-            align-items: center;
             margin-bottom: 10px;
+            transition: color 0.5s ease;
         }
         
         .calendar-header button {
-            color: var(--text-color);
             background: none;
             border: none;
             cursor: pointer;
             font-size: 20px;
+            transition: color 0.5s ease;
         }
         
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 5px;
+            align-items: center;
         }
         
         .calendar-day {
-            color: var(--text-color);
             padding: none;
             margin: 5px;
             text-align: center;
@@ -451,29 +355,28 @@ body {
         }
 
         .calendar-weekday {
-            color: var(--secondary-text-color);
             margin: 5px;
             font-weight: bold;
             text-align: center;
         }
 
         .calendar-day.today {
-            font-weight: bold;
             background-color: var(--main-purple);
+            font-weight: bold;
             border: 2px solid var(--main-purple); /* O cualquier estilo que prefieras */
             border-radius: 50%;
-            box-shadow: 0 0 15px rgba(95,2,169, 0.7);
+            box-shadow: 0 0 10px rgba(117, 31, 255, 0.9);
+            padding: 2px 0;
         }
 
         .schedule-div {
-            border: 1px solid var(--main-purple);
+            border-radius: 5px;
             display: flex;
             flex-direction: column;
-            width: 95%;
-            height: 100%;
             flex: 3;
             margin: auto;
-            padding: 10px;
+            margin-top: 10px;
+            padding: 5px;
             overflow-y: auto;
             /* Personalización de la scrollbar del div */
             scrollbar-width:thin ; /* Ancho de la scrollbar */
@@ -486,18 +389,17 @@ body {
         }
     
             .schedule-title {
-                color: var(--text-color);
                 margin: 5px;
             }
+
     .sep {
         display: flex;
         width: 90%;
         height: 1px;
         margin: auto;
-        background-color: var(--main-purple);
     }
 
-    /* FORM */
+/* FORM */
 #form-div {
     display: none;
     z-index: 9999; /* Asegura que esté por encima de otros elementos */
@@ -505,36 +407,28 @@ body {
     top: 0;
     width: 25%;
     height: 75%;
-    justify-content: center;
     margin: auto;
-    background-color: var(--board-color);
     padding: 40px 10px;
     flex-direction: column;
-    align-items: center;
     text-align: center;
     position: relative; /* Necesario para la posición absoluta del botón de cerrar */
-    border: 1px solid var(--main-purple);
     overflow: auto;
+    box-shadow: 0 0 15px rgba(117, 31, 255, 0.7);
 }
 
 #form-bg {
+    background-color: rgba(21, 16, 46, 0.6);
     display: none;
     position: fixed;
     z-index: 9999; /* Asegura que esté por encima de otros elementos */
     left: 0;
     top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(14, 7, 31, 0.8); /* Fondo semi-transparente */
-    justify-content: center;
 }
 
 #close-form-button {
     display: inline-block;
-    background-color: var(--board-color);
     border: none;
     font-weight: bold;
-    color: var(--main-purple);
     cursor: pointer;
     font-size: 20px;
     text-align: right;
@@ -543,42 +437,28 @@ body {
     right: 10px;
 }
 
-#close-form-button:hover, #close-form-button:focus {
-    outline: none;
-    color: var(--text-color);
-}
-
-#event-form {
-    background-color: var(--main-purple);
-}
-
 .event-form-input {
     margin: 5px 0px;
     padding: 7px;
-    border: 1px solid var(--main-purple);
-    background-color: transparent;
-    color: var(--main-purple);
-    border-radius: 3px;
+    border: 2px var(--card-color) solid;
     width: 70%;
 }
 
 .event-form-input::placeholder {
     font-style: italic;
-    color: var(--main-purple);
     font-weight: bold;
+    border: 2px;
 }
 
 .event-form-input:focus {
-    outline: none;
+    border-color: var(--main-purple);
+    box-shadow: 0 0 10px rgba(117, 31, 255, 0.7);
 }
 
 #eventSubmitButton {
     margin: 5px 0px;
     padding: 7px;
-    border: 1px solid var(--main-purple);
-    background-color: transparent;
-    color: var(--main-purple);
-    border-radius: 3px;
+    border: 2px var(--card-color) solid;
     width: 70%;
     text-align: center;
     cursor: pointer;
@@ -587,80 +467,72 @@ body {
 }
 
 #eventSubmitButton:hover {
-    background-color: rgb(95,2,169);
-    border-color: rgb(95,2,169);
-    color: rgb(184,160,247);
-    box-shadow: 0 0 15px rgba(95,2,169, 0.7);
+    background-color: var(--main-purple);
+    border: none;
+    box-shadow: 0 0 15px rgba(117, 31, 255, 0.7);
+    color: var(--primary-text-color)
 }
 
 #create-event-button {
-    border: 1px var(--board-color) solid;
-}
-
-#create-event-button:hover {
-    color: var(--main-purple);
-    border: 1px solid var(--main-purple);
+    border: none;
+    color: rgb(78, 78, 78);
+    font-size: 20px;
+    padding: 0;
+    transition: color 0.5s ease, background-color 0.5s ease;
 }
 
 .event-div {
     display: flex;
-    flex-direction: column;
     margin: 5px 0;
     padding: 2px;
-    border: 1px solid var(--board-color);
-}
-.event-div:hover {
-    border: 1px solid var(--main-purple);
-    border-radius: 2px;
+    position: relative;
+    transition: color 0.5s ease, background-color 0.5s ease;
 }
 
+.info-div {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    width: 77%;
+    border-left: 4px solid var(--new-color);
+}
 .event-title-div {
     display: flex;
-    justify-content: space-between;
     align-items: flex-start; /* Cambiado a flex-start para alinear los elementos en la parte superior */
-    padding: 5px;
 }
 
 .event-title {
-    color: var(--main-purple);
+    
     font-size: 14px;
     text-align: left;
-}
-
-.buttons-time-div {
-    display: flex;
-    flex-direction: column; /* Cambiado a columna para que los botones estén arriba y la hora debajo */
-    align-items: flex-end; /* Alinea los elementos a la derecha */
-    margin-bottom: 5px;
     justify-content: space-between;
 }
 
-.buttons-div {
-    display: flex;
-}
-
 .event-desc {
-    color: var(--secondary-text-color);
+    font-size: 14px;
 }
 
 .event-time {
-    font-size: 14px;
-    color: var(--secondary-text-color);
+    align-content: center;
+    font-size: 12px;
+    width: 23%;
 }
 
-.edit-button, .delete-button {
+.delete-button {
     display: none;
     border: none;
-    background-color: var(--board-color);
-    color: var(--main-purple);
     font-size: 10px;
-    padding: none;
+    position: absolute;
+    top: 3px;
+    right: 3px;
 }
 
-.event-div:hover .edit-button, .event-div:hover .delete-button {
+.event-div:hover .delete-button {
     display: flex;
 }
 
-.event-div:hover .event-time {
-    display: none;
-}
+.container, .navbar-div, #logo, .navbar-div button, #daily-goals-config-card, .main-div, .board-div, .daily-goals-div, .todo-and-stats-div, .todo-div, .tasks-container, .daily-goals-container, .stats-div, .side-div, .clock-div, .calendar-div, .schedule-div, #form-bg
+{ width: 100%; }
+
+#daily-goals-config-card, .main-di, .board-div, .daily-goals-div, .todo-and-stats-div, .todo-div, .stats-div, #weekly-progress-chart, #daily-progress-chart, .side-div, .calendar-div, .schedule-div, #form-bg
+{ height: 100%; }
