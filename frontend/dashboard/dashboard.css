@@ -307,7 +307,6 @@ header, .todo-div, .daily-goal-div, .daily-goals-card, .todo-div, #weekly-goals-
     justify-content: space-between;
     gap: 10px;
     padding: 5px;
-    border-left: 2px var(--section-color) solid;
 }
     
     .clock-div {
@@ -498,7 +497,7 @@ header, .todo-div, .daily-goal-div, .daily-goals-card, .todo-div, #weekly-goals-
     flex-direction: column;
     padding: 5px;
     width: 77%;
-    border-left: 4px solid var(--new-color);
+    border-left: 4px solid var(--card-color);
 }
 .event-title-div {
     display: flex;

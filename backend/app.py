@@ -134,7 +134,7 @@ def complete_task(task_id):
 def get_tasks():
     session_id = request.args.get("sessionID")
     user = User.query.filter_by(id=session_id).first()
-    tasks = Task.query.filter_by(user_id=user.id).all()
+    tasks = Task.query.filter_by(user_id=user.id).order_by(Task.id).all()
     tasks_list = [{"id": task.id, "task_text": task.task_text, "completed": task.completed} for task in tasks]
 
     return jsonify({"tasks": tasks_list}), 200
@@ -206,7 +206,7 @@ def get_goals():
         (DailyGoal.goal == subquery.c.goal) &
         (DailyGoal.user_id == subquery.c.user_id) &
         (DailyGoal.date == subquery.c.min_date)
-    ).all()
+    ).order_by(DailyGoal.id).all()
 
     goals_list = [{"id": goal.id, "goal": goal.goal, "completed": goal.completed} for goal in goals]
 

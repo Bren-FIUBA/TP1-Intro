@@ -2,7 +2,7 @@ var daily_goals_fetched;
 
 document.addEventListener("DOMContentLoaded", function() {
     const sessionID = localStorage.getItem("sessionID");
-    let selectedDate = new Date();
+    let selectedDate = getCurrentDateInTimeZone();
     localStorage.setItem("selectedDate", selectedDate.toISOString().split("T")[0]);
 
     updateHeader(selectedDate);
@@ -350,10 +350,10 @@ function displayGoals(goals) {
     for (let i = 0; i < goals.length; i++) {
         let goalDiv = document.createElement("div");
         goalDiv.setAttribute("class", "goal-div");
-        goalDiv.setAttribute("data-goal-id", goal.id); // Almacenar el ID del objetivo
+        goalDiv.setAttribute("data-goal-id", goals[i].id); // Almacenar el ID del objetivo
 
         let objetivoTexto = document.createElement("p");
-        objetivoTexto.textContent = goal.goal;
+        objetivoTexto.textContent = goals[i].goal;
         objetivoTexto.setAttribute("class", "goal-text");
         let editarObjetivoButton = crearEditarGoalButton(goalDiv, objetivoTexto);
         let removerObjetivoButton = createButton("button", "❌", function() { removerObjetivo(goalDiv) }, "remove-goal-button");
@@ -454,7 +454,7 @@ function confirmGoalEdit(goalDiv, objetivoInput) {
     goalDiv.innerHTML = "";
     let objetivoTexto = crearTextoObjetivo(objetivoInput);
     let editarButton = crearEditarGoalButton(goalDiv, objetivoTexto);
-    let removeButton = crearButton("button", "❌", function() { removerObjetivo(goalDiv) }, "remove-goal-button");
+    let removeButton = createButton("button", "❌", function() { removerObjetivo(goalDiv) }, "remove-goal-button");
 
     goalDiv.append(objetivoTexto);
     goalDiv.append(editarButton);
@@ -463,6 +463,7 @@ function confirmGoalEdit(goalDiv, objetivoInput) {
     daily_goals_fetched = false;
 }
 function editarObjetivo(goalDiv, objetivoTexto) {
+    if (agregandoObjetivo) { return }
     let objetivoInput = crearGoalsInput();
     objetivoInput.value = objetivoTexto.textContent;
     agregandoObjetivo = true;
@@ -530,7 +531,7 @@ function displayDailyGoals(daily_goals) {
         dailyGoalsContainer.append(dailyGoalDiv);
     }
 }
-function marcarCheckboxDailyGoal(dailyGoalId, completed, selectedDate = new Date()) {
+function marcarCheckboxDailyGoal(dailyGoalId, completed, selectedDate = getCurrentDateInTimeZone()) {
     const sessionID = localStorage.getItem("sessionID");
     selectedDate.setHours(0, 0, 0, 0); // Normaliza la hora a medianoche en la zona horaria configurada
     const formattedDate = selectedDate.toISOString().split("T")[0];
@@ -584,7 +585,7 @@ function createDailyGoalRecords(sessionID) {
 }
 
 // ---------------------------------- Gráficos ----------------------------------
-function getWeeklyProgress(selectedDate = new Date()) {
+function getWeeklyProgress(selectedDate = getCurrentDateInTimeZone()) {
     const sessionID = localStorage.getItem("sessionID");
     const formattedDate = selectedDate.toISOString().split("T")[0];
     const url = `http://127.0.0.1:5000/weekly-progress?sessionID=${sessionID}&date=${formattedDate}`;
@@ -800,7 +801,6 @@ function displayEvents(events) {
             let eventDesc = document.createElement("p");
             eventDesc.textContent = event.description;
             eventDesc.classList.add("event-desc");
-
             eventDiv.appendChild(time);
             eventTitle.appendChild(title);
             infoDiv.appendChild(eventTitle);
