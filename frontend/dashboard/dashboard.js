@@ -112,7 +112,7 @@ function showMainDiv() {
     mainDiv.style.display = "flex";
     configDiv.style.display = "none";
     if (!daily_goals_fetched) { 
-        location.reload()
+        location.reload();
         daily_goals_fetched = true;
     }
 }

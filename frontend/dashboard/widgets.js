@@ -1,6 +1,13 @@
 document.addEventListener("DOMContentLoaded", function() {
     fetchUserInfo(); // Llama a una función para obtener datos del usuario al cargar la página
     updateClock();
+
+    // Obtener la fecha actual para mostrar esos datos al cargar la página
+    const currentDate = new Date();
+    let currentYear = currentDate.getFullYear();
+    let currentMonth = currentDate.getMonth();
+
+    generateCalendar(currentYear, currentMonth); // Generar calendario inicial
 });
 
 // Siempre actualizar la fecha seleccionada a la fecha actual al cargar la página
@@ -69,7 +76,8 @@ function updateClock() {
     hours = hours % 12;
     if (hours === 0) { 
         hours = 12;
-        updateDate(); // A las 12 actualizamos la fecha del header
+        // a las 12 recargamos la página para que se actualice todo, el header, el calendario, los objetivos, todo.
+        location.reload()
     } // La hora '0' debería ser '12' en formato 12 horas
 
     // Formatea los minutos para asegurar dos dígitos
@@ -174,13 +182,6 @@ function updateHeader(date) {
         dateElement.textContent = formattedDate;
     }
 }
-
-// Obtener la fecha actual para mostrar esos datos al cargar la página
-const currentDate = new Date();
-let currentYear = currentDate.getFullYear();
-let currentMonth = currentDate.getMonth();
-
-generateCalendar(currentYear, currentMonth); // Generar calendario inicial
 
 // Manejar la navegación entre meses
 document.getElementById('prev-month').addEventListener('click', () => {
