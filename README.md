@@ -37,3 +37,9 @@ Para instalar y ejecutar esta aplicación localmente, sigue estos pasos:
     - Para el servidor backend: Sólo debes ejecutar el archivo app.py. Puedes hacerlo desde Visual Studio Code abriendo el archivo y ejecutándolo desde la terminal integrada, o desde otra terminal. Como prefieras. 
 
 9. Una vez que la aplicación esté en funcionamiento, prueba acceder a ella desde tu navegador web en localhost:8000
+
+ACLARACIONES DE USO
+- Los objetivos diarios solo podrán crearse, desde la interfaz, para el día actual. Desde la terminal, sin embargo, se pueden cargar registros para cualquier fecha sin problema, y al iniciar sesión se crearán los registros para cada día, desde el primer registro encontrado hasta el día actual (yo creé datos con fecha del 01/07, y automáticamente se crearon registros para cada día desde el 01 hasta el 22, y manualmente fui marcando y desmarcando objetivos para que los gráficos muestren algo).
+- Si el usuario no entra a la página por, por ejemplo, una semana, al volver a iniciar sesión, los registros de cada día en el que no entró se crean igual. Obviamente todos, por defecto, incompletos.
+- Si ya hay objetivos creados, y el usuario quiere agregar uno nuevo, podrá hacerlo, pero tendrá, por ejemplo, 3 objetivos cuyo progeso viene registrándose desde que los creó, y un objetivo que tendrá seguimiento sólo de hoy en adelante. Pero de ahí en adelante, cada día se crearán los 4 juntos sin problema.
+- Editar/Eliminar un objetivo desde la vista de administrador de objetivos editará/borrará TODOS los registros de dicho objetivo
